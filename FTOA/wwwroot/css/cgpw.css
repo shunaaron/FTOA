@@ -1,0 +1,109 @@
+body {
+    background-color: #f4f6f9; /* 保持跟截圖一樣的灰色背景 */
+    font-family: "Microsoft JhengHei", sans-serif;
+}
+
+.cgpw-container {
+    margin-top: 50px;
+    max-width: 450px; /*稍微縮窄一點，看起來更像卡片*/
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-card {
+    background-color: #fff;
+    padding: 40px 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    border-top: 4px solid #28a745; /* 改成綠色線條搭配儲存按鈕，或改回藍色 #0062cc */
+    text-align: center;
+}
+
+/* ★★★ 新增圖片樣式 */
+.security-img {
+    width: 100px;
+    height: auto;
+    margin-bottom: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* 讓標題與描述之間更有層次感 */
+.form-header .text-muted.small {
+    font-size: 16pt !important;
+    color: #dc3545 !important;
+    font-weight: 800;
+    margin-bottom: 5px;
+    text-shadow: 1px 1px 0px rgba(255,255,255,1);
+}
+
+
+    /* 修改標題：18點、藍色 */
+    .form-header h3 {
+        font-size: 18pt !important;
+        color: #0056b3 !important; /* 深藍色 */
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+/* 新增說明文字：16點、預設色(或深灰) */
+/* 修改原有的 .system-desc */
+.form-header .system-desc {
+    font-size: 14pt; /* 略微調小以容納標籤 */
+    color: #444;
+    background-color: #f1f3f5;
+    padding: 15px;
+    border-radius: 12px;
+    display: block; /* 改為區塊以容納內部標籤 */
+    margin-top: 15px;
+    border: 1px dashed #ced4da;
+}
+
+/* 新增標籤樣式 (1)(2) */
+.system-tags-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.system-tag {
+    background-color: #28a745; /* 綠色背景 */
+    color: white;
+    padding: 4px 12px;
+    border-radius: 50px; /* 圓角膠囊狀 */
+    font-size: 12pt;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+}
+
+    .system-tag i {
+        margin-right: 5px;
+    }
+
+.form-group {
+    text-align: left; /* 輸入框標題靠左 */
+    margin-bottom: 20px;
+}
+
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #555;
+    }
+
+.form-control {
+    height: 45px;
+    border-radius: 5px;
+}
+
+/* 按鈕樣式優化 */
+.btn-submit {
+    width: 100%; /* 讓按鈕填滿寬度 */
+    padding: 10px;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    margin-top: 10px;
+}

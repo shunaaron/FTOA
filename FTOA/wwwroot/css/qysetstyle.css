@@ -1,0 +1,133 @@
+﻿/* --- wwwroot/css/qysetstyle.css --- */
+
+/* (保留你喜歡的綠色按鈕樣式，不要動它) */
+.btn-gradient-green {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+.btn-gradient-green:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.6);
+    background: linear-gradient(135deg, #34ce57 0%, #28a745 100%);
+}
+.btn-gradient-green:active { transform: translateY(1px); }
+
+
+/* ========== 請從下方三選一，複製貼上 ========== */
+
+/* --- 選項 A：鋼鐵人反應爐 (Iron Man HUD) --- */
+/*
+.style-hud {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at center, #1a2a3a 0%, #000000 100%); 
+    z-index: 9999;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+}
+.hud-container { position: relative; width: 150px; height: 150px; }
+
+.hud-ring-1 {
+    position: absolute; width: 100%; height: 100%; border-radius: 50%;
+    border: 2px solid transparent; border-top-color: #00ff88; border-bottom-color: #00ff88;
+    animation: hud-spin 2s linear infinite;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+}
+
+.hud-ring-2 {
+    position: absolute; top: -15px; left: -15px; right: -15px; bottom: -15px;
+    border-radius: 50%; border: 2px solid transparent; border-left-color: #00d2ff; border-right-color: #00d2ff;
+    animation: hud-spin-rev 3s linear infinite;
+    opacity: 0.7;
+}
+
+.hud-core {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 80px; height: 80px; border: 1px dashed rgba(255, 255, 255, 0.3); border-radius: 50%;
+    animation: hud-pulse 1s ease-in-out infinite alternate;
+}
+.hud-core::after {
+    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 40px; height: 40px; background: #00ff88; border-radius: 50%;
+    box-shadow: 0 0 30px #00ff88;
+}
+
+.loading-text-hud {
+    margin-top: 50px; font-family: 'Consolas', monospace; font-size: 1.2rem;
+    color: #00ff88; letter-spacing: 3px; text-transform: uppercase;
+    animation: text-glitch 0.5s infinite alternate;
+}
+
+@keyframes hud-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes hud-spin-rev { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
+@keyframes hud-pulse { 0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.5; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+@keyframes text-glitch { 0% { opacity: 1; text-shadow: 2px 0 #00d2ff; } 100% { opacity: 0.8; text-shadow: -2px 0 #ff00de; } }
+*/
+
+/* --- 選項 B：3D 數據方塊 (Cyber Cube) --- */
+ 
+.style-cube {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #111; z-index: 9999;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    perspective: 800px;
+}
+.cube-spinner {
+    width: 80px; height: 80px; position: relative; transform-style: preserve-3d;
+    animation: cube-rotate 2s infinite linear;
+}
+.cube-face {
+    position: absolute; width: 100%; height: 100%;
+    border: 2px solid #00ff88; background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+}
+.cube-face:nth-child(1) { transform: rotateY(0deg) translateZ(40px); }
+.cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(40px); }
+.cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(40px); }
+.cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(40px); }
+.cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(40px); }
+.cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(40px); }
+
+.loading-text-cube {
+    margin-top: 60px; color: white; font-weight: bold; font-size: 1.2rem;
+    letter-spacing: 2px;
+}
+@keyframes cube-rotate {
+    0% { transform: rotateX(0deg) rotateY(0deg); }
+    100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+ 
+
+/* --- 選項 C：極光流體 (Aurora Liquid) --- */
+/*
+.style-aurora {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); z-index: 9999;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+}
+.aurora-ring {
+    position: relative; width: 120px; height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, transparent, transparent 40%, #00ff88);
+    animation: aurora-spin 1s linear infinite;
+}
+.aurora-ring::before {
+    content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px;
+    background: #000; border-radius: 50%; z-index: 2;
+}
+.aurora-ring::after {
+    content: ''; position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px;
+    background: linear-gradient(135deg, transparent, transparent 40%, #00ff88);
+    border-radius: 50%; z-index: 1; filter: blur(20px);
+}
+.loading-text-aurora {
+    position: absolute; z-index: 3; color: white; font-size: 1rem;
+    font-weight: 300; letter-spacing: 1px;
+}
+@keyframes aurora-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    */

@@ -1,0 +1,624 @@
+/* ================= 全域設定 ================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    /* 定義變數方便管理 */
+    --sidebar-width: 250px;
+    --sidebar-collapsed-width: 60px;
+    --header-height: 50px;
+    --bg-dark: #343a40;
+    --bg-darker: #23272b;
+    --toyota-red: #D32F2F;
+    --highlight-blue: #1565C0;
+    --text-color: #ecf0f1;
+}
+
+body {
+    margin: 0;
+    font-family: "Microsoft JhengHei", Arial, sans-serif;
+    overflow: hidden; /* 防止整個頁面出現捲軸 */
+    display: flex; /* 讓 Body 變成 Flex 容器，左右排列 */
+    height: 100vh;
+    width: 100vw;
+}
+
+/* ================= 左側選單 (Sidebar) ================= */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--bg-dark);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0; /* 不縮小 */
+    transition: width 0.3s ease-in-out; /* 寬度動畫 */
+    white-space: nowrap; /* 禁止文字換行，避免收合時字被擠下去 */
+    overflow: hidden;
+}
+
+.sidebar-header {
+    height: 60px;
+    min-height: 60px; /* 固定高度 */
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    background-color: var(--toyota-red); /* 豐田紅 */
+    font-size: 1.2rem;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+/* 標題內的文字區塊 */
+.logo-text {
+    margin-left: 10px;
+    transition: opacity 0.2s;
+}
+
+/* 漢堡選單按鈕 */
+#btn-collapse {
+    cursor: pointer;
+    font-size: 1.2rem;
+    min-width: 25px; /* 確保圖示位置固定 */
+    text-align: center;
+}
+
+.menu-list {
+    list-style: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-grow: 1;
+}
+
+    /* 自訂捲軸樣式 */
+    .menu-list::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .menu-list::-webkit-scrollbar-thumb {
+        background: #555;
+        border-radius: 3px;
+    }
+
+.menu-item {
+    cursor: pointer;
+    padding: 15px 20px;
+    border-bottom: 1px solid #4b545c;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+}
+
+    .menu-item:hover {
+        background-color: #495057;
+    }
+
+    .menu-item i {
+        min-width: 25px; /* 固定圖示寬度 */
+        margin-right: 10px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+
+.menu-text {
+    transition: opacity 0.2s;
+}
+
+.footer-info {
+    padding: 15px;
+    font-size: 0.8rem;
+    text-align: center;
+    background-color: var(--bg-darker);
+    color: #aaa;
+    white-space: nowrap;
+}
+
+/* ================= 收合狀態 (.collapsed) ================= */
+.sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+}
+
+    /* 收合時隱藏文字 */
+    .sidebar.collapsed .menu-text,
+    .sidebar.collapsed .logo-text,
+    .sidebar.collapsed .footer-info span {
+        opacity: 0;
+        pointer-events: none;
+        display: none; /* 直接不顯示 */
+    }
+
+    /* 收合時調整 Header */
+    .sidebar.collapsed .sidebar-header {
+        justify-content: center; /* 圖示置中 */
+        padding: 0;
+    }
+
+    .sidebar.collapsed #btn-collapse {
+        margin: 0; /* 移除 margin */
+    }
+
+    /* 收合時調整選單項目 */
+    .sidebar.collapsed .menu-item {
+        justify-content: center; /* 圖示置中 */
+        padding: 15px 0;
+    }
+
+        .sidebar.collapsed .menu-item i {
+            margin-right: 0;
+        }
+
+/* 修改：父層分類樣式 */
+.menu-category span {
+    color: #2c3e50; /* 深藍灰色，看起來較專業 */
+    font-weight: 600;
+}
+
+/* 父層分類右側的箭頭 */
+.menu-arrow {
+    font-size: 0.8rem !important; /* 覆蓋原本 i 的大小設定 */
+    min-width: auto !important;
+    margin-right: 0 !important;
+    margin-left: auto; /* 推到最右邊 */
+    transition: transform 0.3s ease;
+}
+
+/* ================= 右側主內容區 ================= */
+.main-content {
+    flex-grow: 1; /* 自動填滿剩餘空間 */
+    display: flex;
+    flex-direction: column;
+    background-color: #e9ecef;
+    width: 0; /* 關鍵：設為 0 讓 flex-grow 控制寬度 */
+    transition: all 0.3s; /* 跟隨 Sidebar 變化 */
+}
+
+/* --- 上方分頁標籤列 (Tabs) --- */
+.tabs-header {
+    height: 45px;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    border-bottom: 1px solid #ddd;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+    .tabs-header::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .tabs-header::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+    }
+
+.tab {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 15px;
+    margin-right: 5px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+    .tab:hover {
+        background-color: #e2e6ea;
+    }
+
+    /* 作用中的 Tab */
+    .tab.active {
+        background-color: #fff;
+        border-bottom: 2px solid var(--highlight-blue);
+        color: var(--highlight-blue);
+        font-weight: bold;
+    }
+
+/* 關閉按鈕 (x) */
+.close-tab {
+    margin-left: 8px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: #999;
+    transition: 0.2s;
+}
+
+    .close-tab:hover {
+        background-color: var(--toyota-red);
+        color: #fff;
+    }
+
+
+/* 針對「已刷上傳」這類重要功能的特殊顏色（例如綠色代表成功上傳） */
+.menu-category.upload-status span {
+    color: #27ae60 !important; /* 翡翠綠 */
+}
+
+/* 讓上傳圖標稍微跳動吸引注意 (選填) */
+.fa-cloud-upload-alt {
+    color: #3498db; /* 藍色 */
+}
+
+/* 當父層被加上 open class 時，箭頭旋轉 */
+.menu-category.open .menu-arrow {
+    transform: rotate(90deg);
+}
+
+/* 收合側邊欄時，隱藏箭頭 */
+.sidebar.collapsed .menu-arrow {
+    display: none;
+}
+
+/* --- 子選單容器 --- */
+.submenu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    /* 核心動畫設定：利用 max-height 做滑動效果 */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background-color: var(--bg-darker); /* 子選單背景深一點 */
+}
+
+    /* 當子選單打開時 (透過 JS 動態計算高度或設為大數值) */
+    .submenu-list.open {
+        max-height: 500px; /* 設定一個足夠大的值 */
+        transition: max-height 0.5s ease-in;
+    }
+
+/* 子項目樣式微調 */
+.sub-item {
+    /* 稍微減少左邊縮排，因為加了圖標會佔據空間，改為 35px 或 40px 視覺較平衡 */
+    padding-left: 35px !important;
+    border-bottom: none;
+    font-size: 0.95rem;
+}
+
+    /* 如果希望子選單的圖標比主選單稍微小一點 */
+    .sub-item .menu-icon {
+        font-size: 0.85rem !important; /* 原本可能是 1.1rem */
+        width: 20px; /* 稍微縮小佔位寬度 */
+        text-align: center;
+        margin-right: 8px; /* 圖標與文字的間距 */
+    }
+
+    .sub-item:hover {
+        background-color: #3d444b;
+    }
+
+/* 收合側邊欄時，隱藏整個子選單 (避免破版) */
+.sidebar.collapsed .submenu-list {
+    display: none !important;
+}
+
+/* --- 下方頁面顯示區 (iFrames) --- */
+.tabs-body {
+    flex-grow: 1;
+    position: relative;
+    background-color: #fff;
+    padding: 0;
+    overflow: hidden;
+}
+
+.tab-content {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: none;
+}
+
+    .tab-content.active {
+        display: block;
+    }
+
+
+/* ================= 使用者資訊區塊 ================= */
+.user-info-section {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%);
+    border-top: 1px solid #4b545c;
+    border-bottom: 1px solid #4b545c;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+    .user-info-section i.fa-user-circle {
+        font-size: 42px;
+        color: #4CAF50;
+        min-width: 42px;
+    }
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+}
+
+.user-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-id {
+    font-size: 13px;
+    color: #aaa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ================= Footer 區域 ================= */
+.footer-info {
+    padding: 12px 15px;
+    font-size: 0.8rem;
+    background-color: var(--bg-darker);
+    color: #aaa;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.copyright {
+    font-size: 11px;
+    color: #666;
+}
+
+/* ================= 收合狀態下的使用者資訊 ================= */
+.sidebar.collapsed .user-info-section {
+    justify-content: center;
+    padding: 15px 0;
+}
+
+.sidebar.collapsed .user-details {
+    display: none;
+}
+
+.sidebar.collapsed .user-info-section i {
+    margin: 0;
+}
+
+.sidebar.collapsed .copyright {
+    display: none;
+}
+
+/* ================= ★★★ 跑馬燈樣式 (已移出 @media 區塊，全域生效) ★★★ ================= */
+.announcement-bar {
+    background: linear-gradient(to right, #fff3cd, #fff8e1);
+    color: #856404;
+    border-bottom: 1px solid #ffeeba;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    height: 45px;
+    box-sizing: border-box;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    z-index: 100;
+}
+
+.announcement-icon {
+    margin-right: 12px;
+    color: #e74c3c; /* 紅色鈴鐺 */
+    font-size: 24px;
+    animation: bell-swing 2.5s infinite ease-in-out;
+    transform-origin: top center;
+}
+
+.marquee-content {
+    width: 100%;
+    font-weight: 700;
+    color: #ff0000;
+    line-height: 45px;
+    margin: 0;
+    letter-spacing: 1px;
+    font-size: 20px;
+}
+
+/* 定義鈴鐺搖擺動畫 */
+@keyframes bell-swing {
+    0% {
+        transform: rotate(0);
+    }
+
+    10% {
+        transform: rotate(15deg);
+    }
+
+    20% {
+        transform: rotate(-10deg);
+    }
+
+    30% {
+        transform: rotate(5deg);
+    }
+
+    40% {
+        transform: rotate(-5deg);
+    }
+
+    50% {
+        transform: rotate(0);
+    }
+
+    100% {
+        transform: rotate(0);
+    }
+}
+
+/* ================= RWD 響應式設定 (針對手機螢幕) ================= */
+@media screen and (max-width: 991px) {
+
+    /* 1. 讓側邊欄變成絕對定位，浮在內容之上 */
+    .sidebar {
+        position: absolute;
+        z-index: 1000; /* 確保在最上層 */
+        height: 100vh;
+    }
+
+        /* 2. 當側邊欄展開時，顯示陰影 */
+        .sidebar:not(.collapsed) {
+            box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+        }
+
+    /* 3. 調整主內容寬度 */
+    .main-content {
+        width: 100vw;
+        margin-left: var(--sidebar-collapsed-width);
+    }
+}
+
+/* ================= ★★★ Loading 遮罩層 (毛玻璃特效) ★★★ ================= */
+#loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* 半透明黑 */
+    backdrop-filter: blur(8px); /* ★★★ 毛玻璃模糊特效 ★★★ */
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 99999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+    #loadingOverlay.show {
+        opacity: 1;
+    }
+
+/* 文字樣式 */
+.loading-text {
+    margin-top: 20px;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    font-family: "Microsoft JhengHei", sans-serif;
+}
+
+/* ================= ★★★ B: 現代律動波浪 (Rhythm Wave) ★★★ ================= */
+.loader-wave {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+}
+
+    .loader-wave div {
+        background-color: #fff;
+        height: 100%;
+        width: 6px;
+        margin: 0 3px;
+        border-radius: 4px;
+        animation: wave 1.2s infinite ease-in-out;
+        box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+
+        .loader-wave div:nth-child(1) {
+            animation-delay: -1.1s;
+        }
+
+        .loader-wave div:nth-child(2) {
+            animation-delay: -1.0s;
+        }
+
+        .loader-wave div:nth-child(3) {
+            animation-delay: -0.9s;
+        }
+
+        .loader-wave div:nth-child(4) {
+            animation-delay: -0.8s;
+        }
+
+        .loader-wave div:nth-child(5) {
+            animation-delay: -0.7s;
+        }
+
+@keyframes wave {
+    0%, 40%, 100% {
+        transform: scaleY(0.4);
+        opacity: 0.6;
+    }
+
+    20% {
+        transform: scaleY(1.0);
+        opacity: 1;
+        background-color: #00d2ff;
+    }
+}
+
+/* ================= 文字閃爍動畫 (保留) ================= */
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* --- 主功能文字：亮黃色系 --- */
+.main-menu-yellow {
+    color: #FFD700 !important; /* 金黃色：在深色背景下最清晰 */
+    font-weight: 700 !important; /* 加粗字體 */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8); /* 加上黑陰影，防止字體與背景混在一起 */
+    letter-spacing: 1px; /* 稍微加寬字距，增加辨識度 */
+}
+
+/* 當滑鼠移上去時，變為更亮的鮮黃色 */
+.menu-item:hover .main-menu-yellow {
+    color: #FFF200 !important; /* 鮮黃色 */
+}
+
+/* 如果有子選單展開，可以讓標題稍微變色區隔 */
+.menu-category.open .main-menu-yellow {
+    color: #FFA500 !important; /* 橙色：代表展開中 */
+}
+
+/* --- 子功能文字：建議用淺白色或淺灰色，才不會搶走主功能的視覺 --- */
+.sub-item .menu-text {
+    color: #E0E0E0;
+    font-weight: 400;
+}
+
+/* --- 鈴鐺與公告圖標也要黃色系 --- */
+.announcement-icon {
+    color: #FFD700;
+    margin-right: 8px;
+}
+
+/* --- 上傳圖標 (針對您提到的已刷上傳) --- */
+.fa-cloud-upload-alt {
+    color: #FFD700 !important; /* 統一用黃色系，或者用綠色區隔 */
+}

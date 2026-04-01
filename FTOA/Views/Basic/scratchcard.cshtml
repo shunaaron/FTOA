@@ -1,0 +1,109 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刮刮樂管理系統 - 55% 觸發版</title>
+    <link rel="stylesheet" href="~/css/font_awesome.css">
+    <link rel="stylesheet" href="~/css/scratchcard.css" asp-append-version="true">
+</head>
+<body>
+
+    <!-- 1. 頁首高度壓縮 -->
+    <div class="rule-header" style="padding: 5px 20px; min-height: 40px; display: flex; align-items: center; justify-content: space-between;">
+        <div class="rule-text" style="font-size: 12px; line-height: 1.2;">
+            1. 刮中指定號碼才有中獎。作弊獲獎無效。電眼故障請聯絡台主<br>
+            2. 刮為贈送活動，無金錢往來，同意在遊玩。
+        </div>
+        <div class="promo-text" style="font-size: 20px; font-weight: bold;">
+            夾出 <span id="v-p-items" style="color:red; text-decoration: underline;">?</span> 件，贈送 <span id="v-p-scratches" style="color:red; text-decoration: underline;">1</span> 刮
+            <span style="font-size:12px; font-weight:normal; color:#666; margin-left:10px;">(數字版 <span id="v-total">80</span> 刮)</span>
+        </div>
+    </div>
+
+    <div class="container" style="height: calc(100vh - 60px); overflow: hidden;">
+        <!-- 4. 確保不下拉 -->
+        <div class="sidebar" style="padding-left: 20px;">
+            <!-- 2. 獎項核對往右移一點 -->
+            <div class="info-card">
+                <h4 style="margin:0 0 10px 0;"><i class="fas fa-list-ol"></i> 獎項核對</h4>
+                <div id="list-grand" style="background:#fff5f5; padding:8px; border-radius:10px; margin-bottom:10px;"></div>
+                <div id="list-general" style="background:#fffaf0; padding:8px; border-radius:10px;"></div>
+            </div>
+
+            <!-- 3. 新增已刮數顯示 -->
+            <div class="info-card" style="display: flex; justify-content: space-around; text-align: center; padding: 10px;">
+                <div>
+                    <b style="font-size:14px; color:#666;">已刮數</b>
+                    <span id="c-scratched" style="font-size:24px; color:#333; display:block; font-weight:bold;">0</span>
+                </div>
+                <div style="border-left: 1px solid #eee;"></div>
+                <div>
+                    <b style="font-size:14px; color:#666;">剩餘數</b>
+                    <span id="c-remain" style="font-size:24px; color:red; display:block; font-weight:bold;">0</span>
+                </div>
+            </div>
+
+            <div class="info-card" style="flex: 1; overflow-y: auto;">
+                <h4 style="margin:0 0 5px 0; font-size:14px;"><i class="fas fa-history"></i> 最近紀錄</h4>
+                <div id="scratch-history-list"></div>
+            </div>
+        </div>
+
+        <div class="main-content" style="display: flex; flex-direction: column;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
+                <h3 style="margin:0;">刮刮樂管理系統</h3>
+                <div style="display:flex; gap:8px;">
+                    <!-- 新增按鈕 -->
+                    <button class="btn btn-sm" style="background:#4caf50; color:white" onclick="revealPartial()"><i class="fas fa-eye"></i> 解除已刮</button>
+                    <button class="btn btn-sm" onclick="resetGame()"><i class="fas fa-redo"></i> 重置</button>
+                    <button class="btn btn-sm" style="background:#1c2331; color:white" onclick="openModal()"><i class="fas fa-cog"></i> 設定</button>
+                </div>
+            </div>
+            <!-- 刮版區域 -->
+            <div id="scratch-grid" style="flex: 1; overflow: hidden; display: grid; align-content: center; justify-content: center; gap: 5px;"></div>
+        </div>
+    </div>
+
+    <!-- 系統設定彈窗 -->
+    <div class="modal" id="modalSettings">
+        <div class="modal-body" style="max-width: 450px; width: 95%;">
+            <h3>系統參數設定</h3>
+
+            <!-- 第一行 -->
+            <div style="margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; flex-wrap: wrap; gap: 5px;">
+                夾出 <input type="text" id="i-p-items" class="form-input" style="width:70px; display:inline-block; margin:0 5px;"> 件，
+                贈送 <input type="number" id="i-p-scratches" class="form-input" style="width:70px; display:inline-block; margin:0 5px;"> 刮
+            </div>
+
+            <!-- 第二行 -->
+            <div style="margin-bottom: 20px; font-size: 16px; display: flex; align-items: center; flex-wrap: wrap; gap: 5px;">
+                共 <input type="number" id="i-total" class="form-input" style="width:70px; display:inline-block; margin:0 5px;"> 刮，
+                一行 <input type="number" id="i-cols" class="form-input" style="width:70px; display:inline-block; margin:0 5px;"> 個
+            </div>
+
+            <!-- 第三行 -->
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-weight:bold;">主獎號碼 <span style="font-weight:normal; font-size:12px; color:#666;">(多個用逗號隔開)</span></label>
+                <input type="text" id="i-g-nums" class="form-input" placeholder="例如: 8,18">
+            </div>
+
+            <!-- 第四行 -->
+            <div style="margin-bottom: 25px;">
+                <label style="display:block; margin-bottom:5px; font-weight:bold;">次獎號碼 <span style="font-weight:normal; font-size:12px; color:#666;">(多個用逗號隔開)</span></label>
+                <input type="text" id="i-n-nums" class="form-input" placeholder="例如: 10,20,30">
+            </div>
+
+            <button class="btn" style="background:#1c2331; color:white; width:100%; padding:15px; font-size:18px;" onclick="saveSettings()">儲存並更新</button>
+            <button class="btn" style="width:100%; margin-top:10px; background:#eee" onclick="closeModal()">關閉</button>
+        </div>
+    </div>
+
+
+    <!-- 引入外部 JS 檔案 -->
+    <script src="~/js/scratchcard.js" asp-append-version="true"></script>
+</body>
+</html>

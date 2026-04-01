@@ -1,0 +1,455 @@
+﻿/* --- wwwroot/css/qybase.css --- */
+
+/* =========================================
+   1. 全局設定
+   ========================================= */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0 !important;
+    overflow: hidden; /* 防止整個頁面滾動 */
+    background-color: #f0f2f5;
+    font-family: "Segoe UI", "Microsoft JhengHei", Arial, sans-serif;
+    font-size: 15px; /* 維持較大字體 */
+}
+
+.container-fluid {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 5px 10px;
+}
+
+/* =========================================
+   2. 按鈕與搜尋列
+   ========================================= */
+.btn-glossy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 12px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    color: white !important;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    margin-right: 5px;
+    height: 34px;
+}
+
+.btn-glossy-blue { background-color: #0062cc; border-color: #005cbf; }
+.btn-glossy-blue:hover { background-color: #0056b3; }
+.btn-glossy-green { background-color: #28a745; border-color: #218838; }
+.btn-glossy-green:hover { background-color: #218838; }
+.btn-glossy-gray { background-color: #6c757d; border-color: #6c757d; }
+.btn-glossy-gray:hover { background-color: #5a6268; }
+.btn-glossy-red { background: linear-gradient(to bottom, #d9534f, #c9302c); color: white; border: 1px solid #ac2925; }
+.btn-glossy-red:hover { background: linear-gradient(to bottom, #c9302c, #ac2925); }
+
+.btn-glossy:disabled, .btn-glossy[disabled] {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    filter: grayscale(100%) !important;
+    pointer-events: none;
+}
+
+#actionForm {
+    display: flex !important;
+    align-items: center;
+    flex-shrink: 0;
+    margin-bottom: 5px;
+    background-color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    min-height: 46px;
+}
+
+#actionForm input:not([type="hidden"]):not(.dynamic-detail-param),
+#actionForm select,
+#actionForm .form-group {
+    display: none !important;
+}
+
+/* =========================================
+   3. 核心佈局容器
+   ========================================= */
+#dynamicGridContainer {
+    flex: 1; /* 佔滿剩餘高度 */
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    position: relative;
+    overflow: hidden;
+}
+
+/* --- 主從模式專用設定 (關鍵高度調整) --- */
+
+/* 主檔區塊 */
+.master-grid-block {
+    /* 
+       ★ 設定預設高度 350px 
+       這足以容納 UI (約125px) + 6~7 筆資料 (約225px)
+    */
+    height: 350px; 
+    
+    /* ★ 設定最小高度 320px，保證至少顯示 5 筆資料 */
+    min-height: 320px;
+    
+    /* 設定最大高度，避免把明細擠不見 */
+    max-height: 80vh;
+    
+    flex: 0 0 auto; /* 固定高度，不隨意伸縮，改由 resize 控制 */
+    display: flex;
+    flex-direction: column;
+    border-bottom: 5px solid #b0c4de;
+    resize: vertical; /* 允許使用者手動拉高 */
+    overflow: hidden; 
+    z-index: 10;
+}
+
+/* 明細檔容器 */
+.detail-grid-container {
+    /* ★ 強制佔滿剩下的所有空間 (通常在 1080p 螢幕可顯示 10 筆以上) */
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* 主檔內的 Grid 滾動區 */
+.master-grid-block .grid-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.master-grid-block .grid-table-scroll-area {
+    flex: 1;
+    overflow: auto;
+    height: 100%;
+    max-height: none !important;
+}
+
+/* --- 頁籤模式設定 (填滿修復) --- */
+
+.nav-tabs {
+    flex-shrink: 0;
+    border-bottom: 1px solid #d0d0d0;
+    padding-top: 4px;
+    padding-left: 8px;
+    background-color: #f1f1f1;
+    z-index: 90;
+    min-height: 38px;
+}
+
+.nav-tabs .nav-link {
+    border: 1px solid transparent;
+    border-bottom: none;
+    background-color: transparent;
+    color: #444;
+    margin-right: 2px;
+    font-size: 1rem;
+    padding: 6px 18px;
+    border-radius: 4px 4px 0 0;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link:hover { background-color: #e0e0e0; color: #000; }
+.nav-tabs .nav-link.active {
+    background-color: #fff;
+    color: #217346;
+    font-weight: bold;
+    border: 1px solid #d0d0d0;
+    border-bottom: 1px solid #fff;
+}
+
+/* Tab 內容容器 */
+.tab-content {
+    flex: 1; 
+    /* ★ 確保高度傳遞 */
+    height: 100%; 
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    min-height: 0;
+}
+
+.tab-pane {
+    height: 100%;
+    width: 100%;
+    display: none;
+    flex-direction: column;
+}
+
+/* ★ 讓 active 的 tab-pane 變成 Flex Column 並佔滿 */
+.tab-pane.active {
+    display: flex;
+    flex: 1;
+    height: 100%;
+    overflow: hidden; /* 防止 grid wrapper 溢出 */
+}
+
+/* Grid 包覆層 */
+.grid-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* =========================================
+   4. 表格滾動區與固定表頭
+   ========================================= */
+.grid-table-scroll-area {
+    flex: 1; /* ★ 自動填滿 */
+    overflow: auto;
+    position: relative;
+    border-bottom: 1px solid #dee2e6;
+    height: 100%;
+    max-height: 100% !important; /* 強制覆蓋 */
+    min-height: 0;
+}
+
+.custom-table {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: separate !important;
+    border-spacing: 0;
+}
+
+/* 表頭固定 */
+    .custom-table thead th {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 10 !important;
+        background-color: #d5e3e0 !important; /* 改為淺灰色背景 */
+        color: #333 !important; /* 改為深色文字 */
+        /* ---------------- */
+        padding: 8px 6px !important;
+        font-size: 0.95rem !important;
+        border-bottom: 2px solid #aaa !important; /* 底部邊框改深灰色 */
+        border-right: 1px solid #ddd !important; /* 右側邊框改淡灰色 */
+        font-weight: 600;
+        text-align: center;
+        white-space: nowrap;
+        height: 38px;
+    }
+
+/* 表格內容 */
+.custom-table tbody td {
+    font-size: 0.95rem;
+    padding: 6px 8px;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-left: none;
+    color: #333;
+    vertical-align: middle;
+    white-space: nowrap;
+    height: 34px;
+}
+
+.custom-table tbody tr:nth-of-type(even) { background-color: #f8f9fa; }
+.custom-table tbody tr:hover td { background-color: #fff3cd; color: #000; }
+.custom-table .table-active { background-color: #ffeeba !important; }
+
+/* 統計列 */
+.grid-table-scroll-area tfoot td {
+    position: sticky;
+    bottom: 0;
+    z-index: 11;
+    font-weight: bold;
+    background-color: #f9f9f9;
+    border-top: 2px solid #aaa;
+    font-size: 0.95rem;
+    padding: 6px 8px;
+}
+
+/* =========================================
+   5. Toolbar 與 Pagination
+   ========================================= */
+.grid-toolbar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 4px 10px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    min-height: 44px;
+}
+
+.pagination-container {
+    flex-shrink: 0;
+    padding: 4px 12px;
+    background-color: #fff;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 20;
+    height: 40px;
+}
+
+/* 控制項微調 */
+.grid-toolbar .form-control,
+.grid-toolbar .btn,
+.grid-toolbar select {
+    height: 32px !important;
+    line-height: 1.2;
+    padding: 2px 10px;
+    font-size: 0.9rem !important;
+}
+
+.pagination-left span { font-size: 0.95rem !important; }
+.btn-page-nav {
+    font-size: 0.95rem !important;
+    padding: 2px 10px;
+    height: 30px;
+    line-height: 1.2;
+}
+.btn-page-nav.btn-primary { background-color: #4682b4; color: #fff; }
+
+/* =========================================
+   6. Loading 與 Modal (保持原樣)
+   ========================================= */
+.style-truck-overlay {
+    position: fixed; pointer-events: none; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(20, 20, 25, 0.85); backdrop-filter: blur(5px); z-index: 9999;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+}
+.style-truck-overlay[style*="display: block"], .style-truck-overlay[style*="display: flex"] { pointer-events: auto; }
+.truck-anim-wrapper { width: 280px; height: auto; animation: truck-bounce 0.5s ease-in-out infinite alternate; }
+.truck-svg { width: 100%; height: auto; overflow: visible; }
+.wheel-spin { transform-box: fill-box; transform-origin: center; animation: svg-wheel-spin 0.8s linear infinite; }
+.loading-text-truck { margin-top: 20px; font-size: 1.5rem; color: #fff; font-weight: bold; letter-spacing: 2px; animation: pulse-text 2s infinite; }
+.timer-text-red { margin-top: 10px; color: #ff8a80; font-family: "Consolas", monospace; font-size: 1.2rem; font-weight: bold; background: rgba(0, 0, 0, 0.3); padding: 5px 15px; border-radius: 20px; }
+
+@keyframes svg-wheel-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes truck-bounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+@keyframes pulse-text { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(0.98); } }
+
+/* Modal 優化 */
+#detailModal .modal-dialog { max-width: 95%; margin: 1.75rem auto; }
+#detailModal .modal-body { padding: 15px; background-color: #f8f9fa; }
+.detail-form-grid { display: grid; gap: 10px 20px; align-items: start; }
+.detail-form-grid label { margin-bottom: 4px; font-weight: 600; color: #495057; font-size: 0.95rem !important; }
+.detail-form-grid .form-control { font-size: 1rem; height: 36px; }
+.detail-form-grid { grid-template-columns: 1fr; }
+@media (min-width: 768px) { .detail-form-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .detail-form-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1280px) { .detail-form-grid { grid-template-columns: repeat(6, 1fr); } }
+.detail-field-full { grid-column: 1 / -1; }
+
+/* 讓延遲加載的容器看起來像輸入框 */
+.lazy-select-container {
+    transition: all 0.2s;
+    border: 1px solid #ced4da !important;
+}
+
+    .lazy-select-container:hover {
+        border-color: #80bdff !important;
+        background-color: #f8f9fa !important;
+    }
+/* 選完後的顏色提示 */
+.bg-light-success {
+    background-color: #e6ffed !important;
+    border-color: #28a745 !important;
+}
+
+.stealth-select {
+    /* 移除瀏覽器預設的下拉箭頭與樣式 */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* 移除邊框與背景，讓它看起來像文字 */
+    border: 1px solid transparent !important;
+    background-color: transparent !important;
+    padding-left: 2px; /* 微調位置 */
+    cursor: pointer;
+}
+
+/* 當下拉選單被點擊或選取時，恢復正常樣式 */
+.stealth-select:focus {
+    /* 恢復預設樣式 */
+    -webkit-appearance: menulist;
+    -moz-appearance: menulist;
+    appearance: menulist;
+    /* 恢復邊框與背景 */
+    border: 1px solid #ced4da !important; /* Bootstrap 預設邊框色 */
+    background-color: #fff !important;
+}
+
+/* --- Grid 編輯異動樣式 --- */
+
+/* 1. 整行變色 (淺黃色背景) */
+/* 1. 資料有異動的行 - 改為「淺粉紅」 (與一般的灰色 Hover 區隔) */
+tr.row-dirty,tr.row-dirty > td {
+    background-color: #fff0f0 !important; /* 極淺紅 */
+    transition: background-color 0.3s; /* 讓變色柔和一點 */
+}
+/* 2. ★關鍵★ 當滑鼠移到「有異動的行」上面時 */
+/* 強制維持紅色系，但稍微加深，不要變回灰色的 Hover */
+.table-hover tbody tr.row-dirty:hover > td {
+    background-color: #ffdcdc !important; /* 稍微深一點的粉紅 */
+}
+
+/* 3. 欄位文字變色 - 維持紅色粗體，加強邊框識別 */
+.field-dirty {
+    color: #c00 !important; /* 深紅色文字 */
+    font-weight: bold !important;
+    background-color: #fff !important; /* 輸入框背景保持白色 */
+    border: 2px solid #ff8080 !important; /* 邊框加粗變紅，更明顯 */
+    box-shadow: 0 0 4px rgba(255, 0, 0, 0.2); /* 加一點點光暈 */
+}
+
+/* (選用) 4. 讓勾選的行 (table-active) 優先級最高，避免選取後看不出來 */
+/* 如果您希望「異動」比「選取」更重要，這段可以不用加 */
+tr.table-active.row-dirty > td {
+    background-color: #e6e6fa !important; /* 異動且選取時，顯示淡紫色混合 */
+}
+
+/* 針對 Select2 的異動樣式 */
+.field-dirty + .select2-container .select2-selection {
+    background-color: #fff3cd !important;
+    border-color: #ffc107 !important;
+}
+
+/* 確保當 Modal 開啟時，背景不會真的「死掉」 */
+body.modal-open {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+}
+
+/* 掃碼視窗本體 */
+#barcodeScannerModal {
+    background-color: rgba(0,0,0,0.1) !important; /* 給予極淡的背景感，或設為 transparent */
+    z-index: 11000 !important;
+}
+
+    /* 強制隱藏掃碼視窗產生的任何遮罩 (雙重保險) */
+    #barcodeScannerModal .modal-backdrop {
+        display: none !important;
+    }
+
+/* 確保查詢視窗 (第一層) 的遮罩權重正常，不被第二層影響 */
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+
+/* 如果掃碼視窗關閉後，Body 依然是灰的，這行能解決 */
+body.modal-open {
+    padding-right: 0 !important;
+}

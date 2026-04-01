@@ -1,0 +1,205 @@
+﻿@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>豐田流通 DSS 系統登入</title>
+
+    <!-- 引入 font_awesome -->
+    <link rel="stylesheet" href="~/css/font_awesome.css">
+    <!-- 引入 CSS -->
+    <link rel="stylesheet" href="~/css/login.css">
+
+    <script>
+        // 檢查目前視窗是否被包在 iframe 或是 frame 中
+        if (window.top !== window.self) {
+            // 如果是，強制最上層視窗跳轉到登入頁
+            window.top.location.href = window.self.location.href;
+        }
+    </script>
+
+</head>
+
+<body>
+
+    <!-- 背景圖片層 -->
+    <div class="custom-bg"></div>
+
+    <!-- 道路層 (z-index: 2) -->
+    <div class="road">
+        <div class="road-line"></div>
+    </div>
+
+    <!-- 定義 SVG 漸層 (可共用) -->
+    <svg width="0" height="0" style="position:absolute">
+        <defs>
+            <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#FF5252;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#D32F2F;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#B71C1C;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="metalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#E0E0E0;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#9E9E9E;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#616161;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="windowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#81D4FA;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#0288D1;stop-opacity:1" />
+            </linearGradient>
+            <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+                <feOffset dx="2" dy="4" result="offsetblur" />
+                <feComponentTransfer>
+                    <feFuncA type="linear" slope="0.5" />
+                </feComponentTransfer>
+                <feMerge>
+                    <feMergeNode />
+                    <feMergeNode in="SourceGraphic" />
+                </feMerge>
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- 車子 1：左到右 -->
+    <div class="truck-base truck-l-r">
+        <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" filter="url(#dropShadow)">
+            <!-- 貨箱 -->
+            <path d="M20,60 H240 A10,10 0 0 1 250,70 V200 A10,10 0 0 1 240,210 H20 A10,10 0 0 1 10,200 V70 A10,10 0 0 1 20,60 Z" fill="url(#bodyGrad)" stroke="#B71C1C" stroke-width="2" />
+            <!-- 車頭 -->
+            <path d="M250,100 H300 A20,20 0 0 1 320,120 V200 A10,10 0 0 1 310,210 H250 V100 Z" fill="#D32F2F" stroke="#B71C1C" stroke-width="2" />
+            <!-- 車窗 -->
+            <path d="M260,110 H300 L320,150 H260 V110 Z" fill="url(#windowGrad)" stroke="#01579B" stroke-width="1" />
+            <!-- 裝飾線 (3D感) -->
+            <rect x="20" y="195" width="300" height="15" fill="#333" rx="5" />
+
+            <!-- 輪子 -->
+            <g>
+                <circle cx="70" cy="210" r="28" fill="#333" />
+                <circle cx="70" cy="210" r="18" fill="url(#metalGrad)" />
+                <circle cx="70" cy="210" r="5" fill="#333" />
+            </g>
+            <g>
+                <circle cx="280" cy="210" r="28" fill="#333" />
+                <circle cx="280" cy="210" r="18" fill="url(#metalGrad)" />
+                <circle cx="280" cy="210" r="5" fill="#333" />
+            </g>
+
+            <!-- 文字 -->
+            <text x="130" y="150" fill="#FFFFFF" font-family="Microsoft JhengHei, sans-serif" font-weight="900" font-size="40" text-anchor="middle" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">豐田物流</text>
+        </svg>
+    </div>
+
+    <!-- 車子 2：右到左 -->
+    <div class="truck-base truck-r-l">
+        <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" filter="url(#dropShadow)">
+            <!-- 貨箱 -->
+            <path d="M20,60 H240 A10,10 0 0 1 250,70 V200 A10,10 0 0 1 240,210 H20 A10,10 0 0 1 10,200 V70 A10,10 0 0 1 20,60 Z" fill="url(#bodyGrad)" stroke="#B71C1C" stroke-width="2" />
+            <!-- 車頭 -->
+            <path d="M250,100 H300 A20,20 0 0 1 320,120 V200 A10,10 0 0 1 310,210 H250 V100 Z" fill="#D32F2F" stroke="#B71C1C" stroke-width="2" />
+            <!-- 車窗 -->
+            <path d="M260,110 H300 L320,150 H260 V110 Z" fill="url(#windowGrad)" stroke="#01579B" stroke-width="1" />
+            <!-- 裝飾線 -->
+            <rect x="20" y="195" width="300" height="15" fill="#333" rx="5" />
+
+            <!-- 輪子 -->
+            <g>
+                <circle cx="70" cy="210" r="28" fill="#333" />
+                <circle cx="70" cy="210" r="18" fill="url(#metalGrad)" />
+                <circle cx="70" cy="210" r="5" fill="#333" />
+            </g>
+            <g>
+                <circle cx="280" cy="210" r="28" fill="#333" />
+                <circle cx="280" cy="210" r="18" fill="url(#metalGrad)" />
+                <circle cx="280" cy="210" r="5" fill="#333" />
+            </g>
+
+            <!-- 文字 (注意 transform 翻轉) -->
+            <text x="130" y="150" fill="#FFFFFF" font-family="Microsoft JhengHei, sans-serif" font-weight="900" font-size="40" text-anchor="middle"
+                  style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3); transform: scaleX(-1); transform-origin: 130px 150px;">
+                豐田物流
+            </text>
+        </svg>
+    </div>
+
+    <!-- 登入卡片 -->
+    <div class="login-card">
+        <!-- FT Logo Option 4: Solid Rush (Integrated) -->
+        <svg class="logo-svg" viewBox="0 0 240 140" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
+            <!-- Heavy Italic F (Red) -->
+            <path d="M40,25 L100,25 L90,55 L65,55 L60,75 L80,75 L70,105 L50,105 L35,145 L-10,145 L40,25 Z" fill="#B71C1C" />
+
+            <!-- Heavy Italic T (Blue) touching F -->
+            <g transform="translate(85, 5)">
+                <path d="M10,20 L90,20 L80,50 L60,50 L35,140 L-10,140 L15,50 L-10,50 L0,20 Z" fill="#0D47A1" />
+            </g>
+
+            <!-- Single Motion Line acting as ground/speed -->
+            <rect x="-20" y="130" width="200" height="15" fill="#263238" transform="skewX(-20)" opacity="0.1" />
+            <rect x="0" y="130" width="150" height="8" fill="#D32F2F" transform="skewX(-20)" />
+            <rect x="160" y="130" width="60" height="8" fill="#1976D2" transform="skewX(-20)" />
+        </svg>
+
+        <div class="title">FTOA 系統</div>
+        <!-- 修改部分開始 -->
+        @if (!string.IsNullOrEmpty(ViewBag.Announcement as string))
+        {
+            <marquee direction="left" scrollamount="6" style="color: #D32F2F; font-weight: bold; padding: 5px 0; margin: 10px 0; border: 1px solid #FFCDD2; background-color: #FFEBEE; border-radius: 4px;">
+                @ViewBag.Announcement
+            </marquee>
+        }
+        else
+        {
+            <!-- 如果沒有公告，可以留空或顯示預設高度佔位 -->
+            <div style="height: 10px;"></div>
+        }
+        <!-- 修改部分結束 -->
+        <form method="POST" style="width: 100%;" id="loginForm">
+            <div class="form-group">
+                <div class="edit-mask-wrapper">
+                    <!-- 使用 FontAwesome Icon -->
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" class="form-control" name="username" placeholder="請輸入帳號 / USER ID" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="edit-mask-wrapper">
+                    <!-- 鎖頭圖示 -->
+                    <i class="fas fa-lock input-icon"></i>
+
+                    <!-- 密碼輸入框 (加上 id="passwordInput") -->
+                    <input type="password" class="form-control" name="password" id="passwordInput" placeholder="請輸入密碼 / PASSWORD" required>
+
+                    <!-- 眼睛圖示 (新增這行) -->
+                    <i class="fas fa-eye" id="togglePassword" style="cursor: pointer; color: #888; padding: 0 10px;"></i>
+                </div>
+            </div>
+            <!-- 藍色按鈕 (含 SVG 卡車圖示) -->
+            <button type="submit" class="btn-login">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px; vertical-align: bottom;">
+                    <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+                </svg>
+                登入
+            </button>
+        </form>
+        <div style="color: black; font-size: 18px; margin-top: 10px; text-align: center;">
+            如遇更新後無改變 <br>
+            可按 Ctrl + F5 強制重新整理</br>
+        </div>
+
+        <div class="footer">
+            &copy; 2025 Fengtien Logistics Co., Ltd. <br>VER NO :  @Configuration["ApplicationInfo:Version"]</br>
+        </div>
+    </div>
+
+    <!-- 引用事件JS -->
+    <script src="~/js/login.js"></script>
+</body>
+</html>

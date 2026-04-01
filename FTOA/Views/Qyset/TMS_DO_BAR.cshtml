@@ -1,0 +1,138 @@
+﻿@{
+    Layout = null;
+
+    string powerLvStr = "0";
+    string dfStation = "";
+
+    if (Context != null && Context.Session != null)
+    {
+        powerLvStr = Context.Session.GetString("power_lv") ?? "0";
+        dfStation = Context.Session.GetString("df_station") ?? "";
+    }
+
+    int.TryParse(powerLvStr, out int powerLv);
+}
+
+<script>
+    window.USER_POWER_LV = @powerLv;
+    window.USER_DF_STATION = '@Html.Raw(dfStation)';
+    console.log("權限設定載入:", window.USER_POWER_LV, window.USER_DF_STATION);
+</script>
+
+<link rel="stylesheet" href="~/css/qysetstyle.css">
+
+<style>
+    .compact-label {
+        font-weight: bold;
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+    }
+
+    .compact-form-group {
+        margin-bottom: 10px; /* 縮小行距 */
+    }
+
+    .input-hint {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
+
+<form id="customQueryForm">
+
+    <div class="form-row">
+        <div class="form-group col-md-4 compact-form-group">
+            <label for="PICK_DATE" class="compact-label">
+                <i class="far fa-calendar-alt mr-1"></i> 配取日期
+            </label>
+            <input type="date" id="PICK_DATE" name="PICK_DATE" class="form-control"
+                   value="@DateTime.Now.AddDays(0).ToString("yyyy-MM-dd")">
+        </div>
+
+        <div class="form-group col-md-3 compact-form-group">
+            <label for="TX_TY" class="compact-label">
+                <i class="fas fa-truck-loading mr-1"></i> 配取類型
+            </label>
+            <select id="TX_TY" name="TX_TY" class="form-control">
+                <option value="">全部</option>
+                <option value="A" selected>配送</option>
+                <option value="B">取貨</option>
+            </select>
+        </div>
+
+        <div class="form-group col-md-5 compact-form-group">
+            <label for="STATION_ID" class="compact-label">
+                <i class="fas fa-warehouse mr-1"></i> 配取站所 <span class="text-danger">*</span>
+            </label>
+            <select id="STATION_ID" name="STATION_ID" class="form-control">
+            </select>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-6 compact-form-group">
+            <label for="DRIVER_NAME" class="compact-label">
+                <i class="fas fa-user mr-1"></i> 配送人員
+            </label>
+            <textarea id="DRIVER_NAME" name="DRIVER_NAME" class="form-control" rows="2" placeholder="可輸入多筆姓名 (換行分隔)"></textarea>
+        </div>
+
+        <div class="form-group col-md-6 compact-form-group">
+            <label for="DRIVER_ID" class="compact-label">
+                <i class="fas fa-id-badge mr-1"></i> 配送員編
+            </label>
+            <textarea id="DRIVER_ID" name="DRIVER_ID" class="form-control" rows="2" placeholder="可輸入多筆員編 (換行分隔)"></textarea>
+        </div>
+    </div>
+
+    <!-- ★ 新增：任務編號多行輸入 ★ -->
+    <div class="form-row">
+        <div class="form-group col-12 compact-form-group">
+            <label for="DL_CAR_NO" class="compact-label">
+                <i class="fas fa-tasks mr-1"></i> 任務編號
+            </label>
+            <textarea id="DL_CAR_NO" name="DL_CAR_NO" class="form-control" rows="2" placeholder="可輸入多筆任務編號 (換行分隔)"></textarea>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-12 compact-form-group">
+            <label class="compact-label">
+                <i class="far fa-clock mr-1"></i> 到離時間起迄
+            </label>
+            <div class="input-group">
+                <input type="text" id="TIME_START" name="TIME_START" class="form-control"
+                       placeholder="HHmm" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+
+                <div class="input-group-prepend input-group-append">
+                    <span class="input-group-text">~</span>
+                </div>
+
+                <input type="text" id="TIME_END" name="TIME_END" class="form-control"
+                       placeholder="HHmm" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+            <small class="form-text text-muted">
+                格式範例：202501010830 (代表 2025/01/01 08:30)
+            </small>
+            <!-- ★ 新增：紅色提示字 ★ -->
+            <div class="text-danger font-weight-bold" style="font-size: 1.1rem; margin-top: 8px;">
+                <i class="fas fa-exclamation-triangle mr-1"></i> 注意：無法使用原廠單號查詢
+            </div>
+        </div>
+    </div>
+
+</form>
+
+<hr class="my-3">
+
+<div class="d-flex justify-content-center">
+    <button type="button" id="btnConfirm" class="btn btn-gradient-green mr-3" style="padding: 8px 30px; border-radius: 50px;" onclick="validateAndSubmit()">
+        <i class="fas fa-check mr-2"></i> 確認
+    </button>
+
+    <button type="button" class="btn btn-danger shadow-sm" style="padding: 8px 30px; border-radius: 50px;" data-dismiss="modal">
+        <i class="fas fa-times mr-2"></i> 取消
+    </button>
+</div>
+
+<script src="~/js/TMS_PL_TIME.js" asp-append-version="true"></script>

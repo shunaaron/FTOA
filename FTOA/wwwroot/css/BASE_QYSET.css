@@ -1,0 +1,55 @@
+/* BASE_QYSET.css - 完整修正版 */
+#dynamicQueryContainer {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+}
+
+.dynamic-query-col {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+    padding: 0 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+    .dynamic-query-col.is-range {
+        flex: 0 0 66.666666%; /* 區間佔2格，旁邊還能放一格MEMO */
+        max-width: 66.666666%;
+    }
+
+.query-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    font-size: 0.95rem;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.d-flex.align-items-center {
+    display: flex !important;
+    width: 100%;
+}
+
+    .d-flex.align-items-center .qry-input {
+        flex: 1 !important;
+        width: 1% !important;
+        min-width: 0;
+    }
+
+    .d-flex.align-items-center span.mx-1 {
+        flex: 0 0 auto;
+        padding: 0 5px;
+    }
+
+@media (max-width: 768px) {
+    .dynamic-query-col, .dynamic-query-col.is-range {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+

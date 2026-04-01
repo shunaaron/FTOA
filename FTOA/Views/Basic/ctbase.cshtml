@@ -1,0 +1,250 @@
+﻿<!--
+    ~/Views/Basic/ctbase.cshtml
+-->
+@model FTOA.Controllers.BasicController.QybaseViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基本建立資料共用頁面</title>
+    <!-- Bootstrap 4.6.2 CSS -->
+    <link rel="stylesheet" href="~/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/css/all.min.css">
+    <!-- 自訂 CSS -->
+    <link rel="stylesheet" href="~/css/qybase.css" asp-append-version="true">
+</head>
+<body>
+
+    <div class="container-fluid">
+        <!-- 頂部按鈕區塊 -->
+        <form id="actionForm" method="post">
+            <div class="d-flex align-items-center mb-2 flex-wrap">
+                <!-- 1. 查詢設定 -->
+                <button type="button" id="btnSearch" class="btn-glossy btn-glossy-blue mr-2 mb-1">
+                    <i class="fas fa-search fa-sm mr-1"></i> 條件
+                </button>
+
+                <!-- ★★★ 新增功能按鈕區 (排在查詢之後) ★★★ -->
+                <!-- 2. 新增 -->
+                <button type="button" id="btnAdd" class="btn-glossy btn-glossy-green mr-2 mb-1">
+                    <i class="fas fa-plus fa-sm mr-1"></i> 新增
+                </button>
+
+                <!-- 3. 修改 (預設停用) -->
+                <button type="button" id="btnEdit" class="btn-glossy btn-warning text-white mr-2 mb-1 border-0 shadow-sm" disabled>
+                    <i class="fas fa-edit fa-sm mr-1"></i> 修改
+                </button>
+
+                <!-- 4. 刪除 (預設停用) -->
+                <button type="button" id="btnDel" class="btn-glossy btn-glossy-red mr-2 mb-1" disabled>
+                    <i class="fas fa-trash-alt fa-sm mr-1"></i> 刪除
+                </button>
+
+                <!-- 5. 匯出 (預設停用) -->
+                <button type="button" id="btnExport" class="btn-glossy btn-glossy-green mr-2 mb-1" disabled>
+                    <i class="fas fa-file-excel fa-sm mr-1"></i> 匯出
+                </button>
+
+                <!-- 6. 重置 (保持啟用) -->
+                <button type="button" id="btnReset" class="btn-glossy btn-glossy-gray mb-1">
+                    <i class="fas fa-undo fa-sm mr-1"></i> 重置
+                </button>
+                <button type="button" id="btnScan" class="btn-glossy btn-glossy-orange mr-2 mb-1" style="display:none;">
+                    <i class="fas fa-qrcode fa-sm mr-1"></i> 掃碼
+                </button>
+                <input type="hidden" id="currentGdnaInput" name="currentGdna" value="@ViewBag.CurrentGdna" />
+                <input type="hidden" id="toolIdInput" value="@Model?.CurrentToolId" />
+            </div>
+            <div id="searchCriteriaContainer" class="mb-3"></div>
+        </form>
+
+        <!-- 動態 Grid 內容區 -->
+        <div id="dynamicGridContainer"></div>
+    </div>
+
+    <!-- 查詢設定 Modal -->
+    <div class="modal fade" id="queryModal" tabindex="-1" role="dialog" aria-labelledby="queryModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="queryModalLabel"><i class="fas fa-search mr-1"></i> 查詢條件設定</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="queryModalBody">
+                    <div id="modalLoadingState" class="d-flex flex-column align-items-center justify-content-center py-5">
+                        <div class="loader-orbit">
+                            <div class="inner one"></div><div class="inner two"></div><div class="inner three"></div>
+                        </div>
+                        <div class="mt-3 text-muted font-weight-bold">正在載入設定...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 詳細資料 Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+
+                <!-- 1. 標題區 -->
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="detailModalLabel"><i class="fas fa-list-alt mr-1"></i> 詳細資料</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <!-- 2. 內容區 -->
+                <div class="modal-body">
+                    <form>
+                        <div class="form-row" id="detailModalContent"></div>
+                    </form>
+                </div>
+
+                <!-- 3. 底部按鈕區 -->
+                <div class="modal-footer p-2">
+                    <div class="d-flex flex-column w-100">
+                        <!-- 第一列：導航與跳轉區 -->
+                        <div class="d-flex justify-content-center align-items-center mb-3 w-100">
+                            <button type="button" class="btn btn-outline-secondary mr-2" id="btnModalFirst" title="第一筆">
+                                <i class="fas fa-step-backward fa-lg"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-primary mr-2" id="btnModalPrev" title="上一筆">
+                                <i class="fas fa-chevron-left fa-lg"></i>
+                            </button>
+
+                            <div class="input-group mx-2" style="width: 150px;">
+                                <input type="number" id="inputModalCurrentPage" class="form-control text-center font-weight-bold" value="1" style="font-size: 1.2rem;">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" id="btnModalGo">Go</button>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-outline-primary ml-2 mr-2" id="btnModalNext" title="下一筆">
+                                <i class="fas fa-chevron-right fa-lg"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="btnModalLast" title="最後一筆">
+                                <i class="fas fa-step-forward fa-lg"></i>
+                            </button>
+                        </div>
+
+                        <!-- 第二列：功能按鈕 -->
+                        <!-- ★★★ 修改：加入 position-relative 以便讓貼上按鈕絕對置中 ★★★ -->
+                        <div class="d-flex w-100 align-items-center position-relative">
+                            <span id="action-buttons-area" style="display:none;">
+                                <!-- 修改/儲存按鈕 -->
+                                <button type="button" class="btn btn-warning mr-3 px-3 font-weight-bold" id="btnModalEdit" style="font-size: 14pt;">
+                                    <i class="fas fa-save mr-1"></i> 儲存修改
+                                </button>
+
+                                <!-- ★★★ 新增：刪除資料按鈕 ★★★ -->
+                                <button type="button" class="btn btn-danger mr-3 px-3 font-weight-bold" id="btnModalDelete" style="font-size: 14pt;">
+                                    <i class="fas fa-trash-alt mr-1"></i> 刪除資料
+                                </button>
+                            </span>
+
+                            <!-- 右側區塊：複製與關閉 -->
+                            <!-- ★★★ 修改：貼上按鈕 (透過 style 強制置中，不影響 HTML 結構) ★★★ -->
+                            <button type="button" class="btn btn-info px-3 font-weight-bold" id="btnModalPaste" style="font-size: 14pt; display:none; position: absolute; left: 50%; transform: translateX(-50%);">
+                                <i class="fas fa-paste mr-1"></i> 貼上內容
+                            </button>
+
+                            <div class="ml-auto">
+                                <button type="button" class="btn btn-success mr-3 px-3 font-weight-bold" id="btnModalCopy" style="font-size: 14pt;">
+                                    <i class="fas fa-copy mr-1"></i> 複製內容
+                                </button>
+                                <button type="button" class="btn btn-secondary px-3 font-weight-bold" data-dismiss="modal" style="font-size: 14pt;">
+                                    <i class="fas fa-times mr-1"></i> 關閉頁面
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全螢幕資料查詢遮罩 (加入 Timer) -->
+    <div id="dataLoadingOverlay" class="style-truck-overlay" style="display: none;">
+        <!-- 定義 SVG 漸層 (共用) -->
+        <svg width="0" height="0" style="position:absolute">
+            <defs>
+                <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#FF5252;stop-opacity:1" /><stop offset="50%" style="stop-color:#D32F2F;stop-opacity:1" /><stop offset="100%" style="stop-color:#B71C1C;stop-opacity:1" /></linearGradient>
+                <linearGradient id="metalGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#E0E0E0;stop-opacity:1" /><stop offset="50%" style="stop-color:#9E9E9E;stop-opacity:1" /><stop offset="100%" style="stop-color:#616161;stop-opacity:1" /></linearGradient>
+                <linearGradient id="windowGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#81D4FA;stop-opacity:1" /><stop offset="100%" style="stop-color:#0288D1;stop-opacity:1" /></linearGradient>
+                <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur in="SourceAlpha" stdDeviation="3" /><feOffset dx="2" dy="4" result="offsetblur" /><feComponentTransfer><feFuncA type="linear" slope="0.5" /></feComponentTransfer><feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+            </defs>
+        </svg>
+
+        <div class="loading-container">
+            <!-- 3D SVG Truck (Running Animation) -->
+            <div class="truck-anim-wrapper">
+                <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" filter="url(#dropShadow)" class="truck-svg">
+                    <!-- 貨箱 -->
+                    <path d="M20,60 H240 A10,10 0 0 1 250,70 V200 A10,10 0 0 1 240,210 H20 A10,10 0 0 1 10,200 V70 A10,10 0 0 1 20,60 Z" fill="url(#bodyGrad)" stroke="#B71C1C" stroke-width="2" />
+                    <!-- 車頭 -->
+                    <path d="M250,100 H300 A20,20 0 0 1 320,120 V200 A10,10 0 0 1 310,210 H250 V100 Z" fill="#D32F2F" stroke="#B71C1C" stroke-width="2" />
+                    <!-- 車窗 -->
+                    <path d="M260,110 H300 L320,150 H260 V110 Z" fill="url(#windowGrad)" stroke="#01579B" stroke-width="1" />
+                    <!-- 裝飾線 -->
+                    <rect x="20" y="195" width="300" height="15" fill="#333" rx="5" />
+
+                    <!-- 輪子 -->
+                    <g class="wheel-spin">
+                        <circle cx="70" cy="210" r="28" fill="#333" />
+                        <circle cx="70" cy="210" r="18" fill="url(#metalGrad)" />
+                        <circle cx="70" cy="210" r="5" fill="#333" />
+                    </g>
+                    <g class="wheel-spin">
+                        <circle cx="280" cy="210" r="28" fill="#333" />
+                        <circle cx="280" cy="210" r="18" fill="url(#metalGrad)" />
+                        <circle cx="280" cy="210" r="5" fill="#333" />
+                    </g>
+
+                    <!-- 文字 -->
+                    <text x="130" y="150" fill="#FFFFFF" font-family="Microsoft JhengHei, sans-serif" font-weight="900" font-size="40" text-anchor="middle" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">豐田物流</text>
+                </svg>
+            </div>
+
+            <div class="loading-text-truck">資料即將抵達...</div>
+            <div id="loadingTimer" class="timer-text-red">用時: 0.00 秒</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // 1. 若 ViewBag 為空，預設為空物件 {}，否則直接輸出 JSON
+        var GLOBAL_GRID_CONFIGS = @Html.Raw(string.IsNullOrEmpty(ViewBag.GridConfigsJson as string) ? "{}" : ViewBag.GridConfigsJson);
+        var CURRENT_TOOL_CONFIG = @Html.Raw(string.IsNullOrEmpty(ViewBag.ToolJsJson as string) ? "{}" : ViewBag.ToolJsJson);
+        var SEARCH_RESULT = @Html.Raw(string.IsNullOrEmpty(ViewBag.SearchResultJson as string) ? "{}" : ViewBag.SearchResultJson);
+
+        // 2. 字串型別保持原樣
+        var SERVER_ACTIVE_GDNA = '@ViewBag.CurrentGdna';
+
+
+        var rawGridConfigs = '@Html.Raw(ViewBag.GridConfigsJson)';
+        var rawToolJs = '@Html.Raw(ViewBag.ToolJsJson)';
+        var rawSearchResult = '@Html.Raw(ViewBag.SearchResultJson)';
+
+
+    </script>
+    <!-- 1. 載入異動邏輯 (ctbase) -->
+    <script src="~/js/ctbase.js" asp-append-version="true"></script>
+    <!-- 2. 載入查詢邏輯 -->
+    <script src="~/js/qybase.js" asp-append-version="true"></script>
+
+</body>
+</html>

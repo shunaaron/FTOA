@@ -1,0 +1,109 @@
+﻿@{
+    Layout = null;
+
+    string powerLvStr = "0";
+    string dfStation = "";
+
+    if (Context != null && Context.Session != null)
+    {
+        powerLvStr = Context.Session.GetString("power_lv") ?? "0";
+        dfStation = Context.Session.GetString("df_station") ?? "";
+    }
+
+    int.TryParse(powerLvStr, out int powerLv);
+}
+
+<script>
+    window.USER_POWER_LV = @powerLv;
+    window.USER_DF_STATION = '@Html.Raw(dfStation)';
+    console.log("權限設定載入:", window.USER_POWER_LV, window.USER_DF_STATION);
+</script>
+
+<link rel="stylesheet" href="~/css/qysetstyle.css">
+
+<style>
+    .compact-label {
+        font-weight: bold;
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+    }
+
+    .compact-form-group {
+        margin-bottom: 10px; /* 縮小行距 */
+    }
+
+    .input-hint {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
+
+<form id="customQueryForm">
+
+    <div class="container-fluid p-2">
+        <div class="row">
+            <!-- 1. 系統名稱 (下拉選單) -->
+            <div class="col-md-6 form-group">
+                <label for="qry_sys_id" class="font-weight-bold" style="font-size: 14pt;">
+                    <i class="fas fa-server mr-1"></i> 系統名稱
+                </label>
+                <select id="qry_sys_id" class="form-control form-control-lg" style="font-size: 14pt;">
+                    <option value="">(載入中...)</option>
+                </select>
+            </div>
+
+            <!-- 3. 開放方式 (下拉選單) -->
+            <div class="col-md-6 form-group">
+                <label for="qry_do_ty" class="font-weight-bold" style="font-size: 14pt;">
+                    <i class="fas fa-unlock-alt mr-1"></i> 開放方式
+                </label>
+                <select id="qry_do_ty" class="form-control form-control-lg" style="font-size: 14pt;">
+                    <option value="">(載入中...)</option>
+                </select>
+            </div>
+
+            <!-- 2. 群編號 (Memo / Like) -->
+            <div class="col-md-12 form-group">
+                <label for="qry_gd_no" class="font-weight-bold" style="font-size: 14pt;">
+                    <i class="fas fa-layer-group mr-1"></i> 群編號 (模糊查詢)
+                </label>
+                <textarea id="qry_gd_no" class="form-control form-control-lg" rows="2"
+                          style="font-size: 14pt;" placeholder="請輸入群編號關鍵字..."></textarea>
+            </div>
+
+            <!-- 4. 功能名稱 (Memo / Like) -->
+            <div class="col-md-12 form-group">
+                <label for="qry_sw_name" class="font-weight-bold" style="font-size: 14pt;">
+                    <i class="fas fa-file-signature mr-1"></i> 功能名稱 (模糊查詢)
+                </label>
+                <textarea id="qry_sw_name" class="form-control form-control-lg" rows="2"
+                          style="font-size: 14pt;" placeholder="請輸入功能名稱關鍵字..."></textarea>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+<hr class="my-4">
+
+<!-- 按鈕區 -->
+<div class="d-flex justify-content-center">
+    <!-- ★★★ 修正點：使用新的 btn-gradient-green 樣式 ★★★ -->
+    <button type="button" id="btnConfirm" class="btn btn-gradient-green btn-lg mr-3" style="font-size: 14pt; padding: 10px 30px; border-radius: 50px;" onclick="validateAndSubmit()">
+        <i class="fas fa-check mr-2"></i> 確認
+    </button>
+
+    <button type="button" class="btn btn-danger btn-lg shadow-sm" style="font-size: 14pt; padding: 10px 30px; border-radius: 50px;" data-dismiss="modal">
+        <i class="fas fa-times mr-2"></i> 取消
+    </button>
+</div>
+
+<script src="~/js/TMS_PL_TIME.js" asp-append-version="true"></script>
+
+<script>
+    // 當 Modal 顯示時，或者頁面載入後初始化下拉選單
+    $(document).ready(function () {
+        // 如果是靜態頁面直接執行；如果是 Modal 載入，請確保這段在 HTML 載入後執行
+        TMS_WEBTL_QY_CB();
+    });
+</script>

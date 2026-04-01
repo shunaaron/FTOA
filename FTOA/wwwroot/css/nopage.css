@@ -1,0 +1,127 @@
+body {
+    background-color: #f4f6f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    margin: 0;
+}
+
+.construction-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    background-color: #f7f9fc;
+    padding: 20px;
+}
+
+/* --- 動畫區域 --- */
+.animation-box {
+    position: relative;
+    height: 120px;
+    width: 200px;
+    margin: 0 auto 30px auto;
+}
+
+/* 大齒輪 */
+.gear-big {
+    font-size: 80px;
+    color: #3498db;
+    position: absolute;
+    left: 40px;
+    top: 10px;
+    animation: spin 4s linear infinite;
+}
+
+/* 小齒輪 */
+.gear-small {
+    font-size: 50px;
+    color: #e74c3c;
+    position: absolute;
+    left: 110px;
+    top: 45px;
+    animation: spin-reverse 3s linear infinite;
+}
+
+/* 槌子 */
+.hammer {
+    font-size: 60px;
+    color: #f1c40f;
+    position: absolute;
+    left: -20px;
+    top: 0;
+    transform-origin: bottom right;
+    animation: hammer-hit 2s ease-in-out infinite;
+}
+
+/* 標題文字 */
+h2 {
+    color: #2c3e50;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+p {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+/* 按鈕樣式 */
+.btn-back {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-size: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+    .btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+/* --- Keyframes 動畫定義 (修正點：這裡只要一個 @) --- */
+
+/* 順時針旋轉 */
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* 逆時針旋轉 */
+@keyframes spin-reverse {
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+
+/* 敲擊動作 */
+@keyframes hammer-hit {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(-30deg);
+    }
+
+    60% {
+        transform: rotate(10deg);
+    }
+
+    70% {
+        transform: rotate(0deg);
+    }
+}

@@ -1,0 +1,52 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>功能建置中</title>
+    
+    <!-- 引用 Bootstrap (與您專案一致) -->
+    <link rel="stylesheet" href="~/css/bootstrap.min.css">
+    <!-- 引用 Font Awesome -->
+    <link rel="stylesheet" href="~/css/all.min.css">
+    <link rel="stylesheet" href="~/css/nopage.css">
+</head>
+<body>
+
+    <div class="construction-container">
+        <!-- 動畫區 -->
+        <div class="animation-box">
+            <i class="fas fa-hammer hammer"></i>
+            <i class="fas fa-cog gear-big"></i>
+            <i class="fas fa-cog gear-small"></i>
+        </div>
+
+        <!-- 文字區 -->
+        <h2>功能建置中</h2> 
+        <p>
+            工程師正在加緊趕工開發此功能。<br>
+            我們致力於提供更好的系統體驗，敬請期待！
+        </p>
+
+ 
+    </div>
+
+    <script>
+        function goBack() {
+            // 如果是在 iframe 中，嘗試返回上一頁，或者你可以改成關閉 Tab 的邏輯
+            // 這裡簡單使用 history.back
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                // 如果沒有上一頁 (例如直接貼網址)，則導回首頁
+                // 這裡假設你的 iframe 內部首頁是 Qybase，或者留空
+                alert("目前無上一頁紀錄");
+            }
+        }
+    </script>
+</body>
+</html>

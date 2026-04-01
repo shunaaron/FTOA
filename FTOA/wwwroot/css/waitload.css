@@ -1,0 +1,56 @@
+﻿/* Loading 層樣式 */
+#loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* 最上層 */
+    display: none; /* 預設隱藏 */
+}
+
+    /* ✅ 當加上 show class 時顯示 */
+    #loadingOverlay.show {
+        display: flex !important;
+    }
+
+#loadingContent {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+#loadingIcon {
+    width: 300px;
+    height: 300px;
+    margin-bottom: 10px;
+}
+
+#loadingText {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-top: 15px;
+}
+
+#waitrotating {
+    width: 300px; /* 設置圖片大小 */
+    height: 300px;
+    animation: rotateAnimation 2s linear infinite; /* 設定動畫名稱、持續時間、運行方式以及循環次數 */
+}
+
+/* 定義動畫 */
+@keyframes rotateAnimation {
+    0% {
+        transform: rotate(0deg); /* 開始時圖片不旋轉 */
+    }
+
+    100% {
+        transform: rotate(360deg); /* 結束時圖片旋轉 360 度 */
+    }
+}

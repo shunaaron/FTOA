@@ -1,0 +1,98 @@
+/* wwwroot/nojspage.css */
+/*頁面整體佈局*/
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    background-color: #f7f9fc;
+    padding: 20px;
+}
+
+/* 動畫容器 */
+.animation-box {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 30px;
+}
+
+/* 警告圖標 (中心大圖標) */
+.warning-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 5rem;
+    color: #ffc107; /* 警告色 (黃色) */
+    z-index: 10;
+}
+
+/* 齒輪圖標 (動畫) */
+.gear {
+    position: absolute;
+    font-size: 3rem;
+    color: #6c757d; /* 灰色 */
+}
+
+/* 齒輪位置與大小 */
+.gear-1 {
+    top: 10px;
+    left: 10px;
+    font-size: 4rem;
+}
+
+.gear-2 {
+    bottom: 5px;
+    right: 5px;
+    font-size: 2.5rem;
+}
+
+/* 定義旋轉動畫 */
+/* ★★★ 修正點：這裡只要一個 @ 符號 ★★★ */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* 應用動畫 */
+.gear-1 {
+    animation: spin 8s linear infinite reverse; /* 慢速反向旋轉 */
+}
+
+.gear-2 {
+    animation: spin 4s linear infinite; /* 快速正向旋轉 */
+}
+
+/* 文字樣式 */
+.error-container h2 {
+    font-size: 2.5rem;
+    color: #dc3545; /* 錯誤提示色 (紅色) */
+    margin-bottom: 15px;
+}
+
+.error-container p {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin-bottom: 30px;
+    max-width: 500px;
+}
+
+.error-container ul {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    margin: 15px auto;
+}
+
+    .error-container ul li {
+        margin-bottom: 5px;
+        font-size: 1rem;
+    }

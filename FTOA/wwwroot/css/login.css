@@ -1,0 +1,367 @@
+/* --- wwwroot/css/login.css --- */
+
+/* 變數設定 */
+:root {
+    --ft-blue: #004080;
+    --ft-red: #D32F2F;
+    --road-color: #505050;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background-color: #87CEEB;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* ============================
+   背景圖片 (取代原本的天空與城市)
+   ============================ */
+.custom-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* ▼▼▼ 修改這裡 ▼▼▼ */
+    /* 原本是 100%，改成用 calc 計算：總高度 100vh 扣掉馬路的 300px */
+    height: calc(100vh - 300px);
+    /* ▲▲▲ 修改這裡 ▲▲▲ */
+
+    background-image: url('../image/index_background.jpg');
+    /* 建議維持 cover，讓圖片填滿上方空間 */
+    background-size: cover;
+    /* 如果您希望圖片的「底部」貼齊馬路，請設定 bottom */
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    z-index: 1;
+    /* 在最底層 (但現在因為高度縮減，不會跟馬路重疊了) */
+}
+
+/* ============================
+   馬路 (Road)
+   ============================ */
+.road {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 300px;
+    background-color: #808080;
+    /* 標準灰色 */
+    border-top: 5px solid #999999;
+    /* 淺灰色邊框 */
+    z-index: 3;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* 馬路虛線 (保留) */
+.road-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 0;
+    border-top: 6px dashed #fff;
+    opacity: 0.6;
+    transform: translateY(-50%);
+}
+
+/* ============================
+   卡車動畫 (Truck Animation)
+   ============================ */
+.truck-base {
+    position: absolute;
+    /* 卡車要在馬路之上 (Road 是 2，所以這裡是 3) */
+    z-index: 3;
+    width: 250px;
+    height: auto;
+    /* 移除 drop-shadow 因為 SVG 內部已有濾鏡 */
+}
+
+/* 第一台車：左 -> 右 */
+.truck-l-r {
+    bottom: 10%;
+    left: -300px;
+    z-index: 4;
+    animation: driveRight 12s linear infinite;
+}
+
+/* 第二台車：右 -> 左 */
+.truck-r-l {
+    bottom: 0%;
+    left: 100%;
+    z-index: 5;
+    animation: driveLeft 10s linear infinite;
+    transform: scaleX(-1);
+    /* 直接翻轉整個 SVG */
+}
+
+/* 注意：在 .css 檔案中，只要用一個 @ 即可 */
+@keyframes driveRight {
+    0% {
+        transform: translateX(-300px);
+    }
+
+    100% {
+        transform: translateX(110vw);
+    }
+}
+
+@keyframes driveLeft {
+    0% {
+        transform: translateX(10vw) scaleX(-1);
+    }
+
+    100% {
+        transform: translateX(-120vw) scaleX(-1);
+    }
+}
+
+/* --- 登入卡片 --- */
+.login-card {
+    position: relative;
+    z-index: 999;
+    background: rgba(255, 255, 255, 0.9);
+    /* 稍微增加不透明度以配合 Neumorphism */
+    /* 修改這裡：讓寬度變彈性 */
+    width: 90;
+    /* 在手機上佔螢幕寬度的 90% */
+    max-width: 400px;
+    /* 在電腦上最大只會到 400px，不會無限變大 */
+
+    padding: 50px 40px;
+    border-radius: 12px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    border-top: 6px solid var(--ft-red);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Logo 樣式調整 */
+.logo-svg {
+    width: 120px;
+    /* 設定這張圖在螢幕上顯示的寬度 */
+    height: 120px;
+    /* 設定高度 */
+    margin-bottom: 20px;
+}
+
+.title {
+    font-size: 1.4rem;
+    color: var(--ft-blue);
+    margin-bottom: 35px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.form-group {
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+.edit-mask-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* Neumorphism Style (Option C) */
+    background: #e6e9ef;
+    /* 稍微深一點的灰色背景，讓亮部陰影顯現 */
+    border: none;
+    /* 移除原本的邊框 */
+    border-radius: 10px;
+    /* 圓角 */
+    padding: 0 15px;
+    height: 55px;
+    transition: all 0.3s;
+    /* 內陰影：左上深色，右下亮色 (模擬凹陷感) */
+    box-shadow: inset 5px 5px 10px #c8cdd6, inset -5px -5px 10px #ffffff;
+}
+
+    .edit-mask-wrapper:focus-within {
+        /* 聚焦時陰影變淺，產生變化 */
+        box-shadow: inset 2px 2px 5px #c8cdd6, inset -2px -2px 5px #ffffff;
+    }
+
+.input-icon {
+    color: #888;
+    font-size: 1.2rem;
+    margin-right: 15px;
+}
+
+.footer {
+    margin-top: 25px;
+    font-size: 18px;
+    /* 原本是 0.85rem，改成 1.2rem 或 18px */
+    font-weight: bold;
+    /* 建議加粗，看起來比較清楚 */
+    color: #555;
+    /* 字體顏色 (深灰色)，對比度較好 */
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+    width: 100%;
+}
+
+.form-control {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 1.1rem;
+    flex-grow: 1;
+    height: 100%;
+    font-family: "Consolas", "Monaco", monospace;
+    color: #333;
+    font-weight: 600;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    /* 這裡改成藍色 */
+    background-color: #1565C0;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 6px rgba(21, 101, 192, 0.3);
+    /* 讓裡面的文字和 SVG 置中對齊 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    .btn-login:hover {
+        /* Effect 3: Pulse Animation */
+        animation: pulse-animation 1s infinite;
+        background-color: #D32F2F;
+        /* 懸停時變紅色 */
+    }
+
+/* 定義脈衝動畫 */
+@keyframes pulse-animation {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.footer {
+    margin-top: 25px;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+/* 眼睛圖示的樣式 */
+#togglePassword {
+    cursor: pointer;
+    /* 滑鼠移上去變手指 */
+    color: #888;
+    /* 預設灰色 */
+    margin-left: 10px;
+    /* 與輸入框保持一點距離 */
+    font-size: 1.1rem;
+    /* 大小 */
+    transition: color 0.3s;
+}
+
+    #togglePassword:hover {
+        color: #1565C0;
+        /* 滑鼠懸停時變藍色 (配合您的主題色) */
+    }
+
+/* 登入按鈕 Disable 狀態樣式 */
+.btn-login:disabled {
+    background-color: #7f9ab3;
+    /* 變灰藍色 */
+    cursor: not-allowed;
+    opacity: 0.8;
+    transform: none;
+    /* 移除按下去的位移效果 */
+    box-shadow: none;
+}
+
+/* 確保 FontAwesome 的旋轉動畫順暢 */
+.fa-spin {
+    margin-right: 8px;
+    animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- RWD 響應式設定 (針對手機螢幕) --- */
+@media screen and (max-width: 480px) {
+
+    /* 1. 縮小登入卡片的內距，讓畫面不要太擠 */
+    .login-card {
+        padding: 30px 20px;
+    }
+
+    /* 2. 稍微縮小 Logo */
+    .logo-svg {
+        width: 90px;
+        height: 90px;
+    }
+
+    /* 3. 標題字變小一點 */
+    .title {
+        font-size: 1.2rem;
+        margin-bottom: 25px;
+    }
+
+    /* 4. 讓背景的車子變小，才不會在手機上看起來巨大無比 */
+    .truck-base {
+        width: 150px;
+        /* 電腦是 220px，手機改 150px */
+    }
+
+    /* 5. 調整車子動畫位置，避免遮住輸入框 */
+    .truck-l-r {
+        bottom: 20%;
+        /* 稍微往上移 */
+    }
+
+    .truck-r-l {
+        bottom: 5%;
+    }
+}
+
+.marquee-box {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 6px 0;
+    margin-bottom: 15px;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+}

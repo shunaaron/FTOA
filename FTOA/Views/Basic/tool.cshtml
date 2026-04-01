@@ -1,0 +1,132 @@
+﻿@using static FTOA.Controllers.BasicController
+@model List<MenuItem>
+
+@{
+    Layout = null;
+    var userName = Context.Session.GetString("user_name") ?? "訪客";
+    var userId = Context.Session.GetString("id_no") ?? "";
+    var announcement = ViewBag.Announcement as string;
+}
+
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>豐田流通管理系統</title>
+    <link rel="stylesheet" href="~/css/font_awesome.css">
+    <link rel="stylesheet" href="~/css/tool.css">
+ 
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-bars" id="btn-collapse" onclick="toggleSidebar()"></i>
+            <span class="logo-text">豐田物流系統</span>
+        </div>
+
+        <ul class="menu-list">
+            @if (Model != null)
+            {
+                foreach (var category in Model)
+                {
+                    bool hasSub = category.SubItems != null && category.SubItems.Count > 0;
+
+                    <li class="menu-item @(hasSub ? "menu-category" : "")"
+                        onclick="@(hasSub ? "toggleSubmenu(this)" :
+           (category.OpenMode == 0 ? "return false;" :
+           (category.OpenMode == 2 ? $"window.open('{category.Url}', '_blank', 'noopener=yes,noreferrer=yes');" :
+           $"addTab('{category.Id}', '{category.Title}', '{category.Url}')")))">
+
+                        <div class="menu-link-content">
+                            <i class="@category.Icon menu-icon"></i>
+                            <span class="menu-text main-menu-yellow">@category.Title</span>
+                        </div>
+
+                        @if (hasSub)
+                        {
+                            <i class="fas fa-chevron-right arrow-icon"></i>
+                        }
+                    </li>
+
+                    if (hasSub)
+                    {
+                        <ul class="submenu-list">
+                            @foreach (var subItem in category.SubItems)
+                            {
+                                <li class="menu-item sub-item"
+                                    data-tool-js="@subItem.ToolJs"
+                                    onclick="event.stopPropagation(); @(subItem.OpenMode == 0 ? "return false;" :
+                                               (subItem.OpenMode == 2 ? $"window.open('{subItem.Url}', '_blank', 'noopener=yes,noreferrer=yes');" :
+                                               $"addTab('{subItem.Id}', '{subItem.Title}', '{subItem.Url}', this.getAttribute('data-tool-js'))"))">
+
+                                    @{
+                                        var subIcon = string.IsNullOrEmpty(subItem.Icon) ? $"fas fa-{subItem.Seq}" : subItem.Icon;
+                                        if (subItem.Title.Contains("上傳")) subIcon = "fas fa-cloud-upload-alt";
+                                    }
+                                    <i class="@subIcon menu-icon" style="font-size: 0.9rem;"></i>
+
+                                    <span class="menu-text">@subItem.Title</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                }
+            }
+            <li class="menu-item logout-item" onclick="logout()">
+                <div class="menu-link-content">
+                    <i class="fas fa-sign-out-alt menu-icon"></i>
+                    <span class="menu-text">登出系統</span>
+                </div>
+            </li>
+        </ul>
+
+        <div class="user-info-section">
+            <i class="fas fa-user-circle"></i>
+            <div class="user-details">
+                <span class="user-name">@userName</span>
+                <span class="user-id">@userId</span>
+                <span class="ver-no">VER NO :  @Configuration["ApplicationInfo:Version"]</span>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <span class="copyright">&copy; 2025 Fengtien</span>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+
+        <!-- ★★★ 修改：換成鈴鐺圖示 (fa-bell) ★★★ -->
+        @if (!string.IsNullOrEmpty(announcement))
+        {
+            <div class="announcement-bar">
+                <!-- 這裡改成 fa-bell -->
+                <i class="fas fa-bell announcement-icon"></i>
+                <marquee direction="left" scrollamount="8" class="marquee-content">
+                    @announcement
+                </marquee>
+            </div>
+        }
+
+        <div class="tabs-header" id="tabsHeader">
+            <div class="tab active" id="tab-home" onclick="switchTab('home')">
+                關於豐田
+            </div>
+        </div>
+        <div class="tabs-body" id="tabsBody">
+            <iframe src="https://www.fengtien.com.tw/about/" class="tab-content active" id="frame-home"></iframe>
+        </div>
+    </div>
+
+    <!-- Loading 遮罩 HTML -->
+    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center; color:white;">
+        <i class="fas fa-spinner fa-spin fa-3x"></i>
+    </div>
+
+    <script src="~/js/tool.js"></script>
+</body>
+</html>

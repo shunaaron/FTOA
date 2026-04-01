@@ -1,0 +1,88 @@
+﻿@{
+    Layout = null;
+
+    // ★ 修正 1: 直接使用 Context.Session，不需要 Inject (避免 500 錯誤)
+    string powerLvStr = "0";
+    string dfStation = "";
+
+    if (Context != null && Context.Session != null)
+    {
+        powerLvStr = Context.Session.GetString("power_lv") ?? "0";
+        dfStation = Context.Session.GetString("df_station") ?? "";
+    }
+
+    int.TryParse(powerLvStr, out int powerLv);
+}
+
+<!-- ★ 修正 2: 使用 window 全域變數，確保 JS 讀取得到 -->
+<script>
+    window.USER_POWER_LV = @powerLv;
+    window.USER_DF_STATION = '@Html.Raw(dfStation)'; // 使用 Html.Raw 避免特殊字元問題
+    console.log("權限設定載入:", window.USER_POWER_LV, window.USER_DF_STATION);
+</script>
+
+<!-- 引用 CSS (確保樣式生效) -->
+<link rel="stylesheet" href="~/css/qysetstyle.css">
+
+<form id="customQueryForm">
+    <!-- 1. 配取日期 -->
+    <div class="form-group">
+        <label for="PICK_DATE" class="font-weight-bold" style="font-size: 14pt;">
+            <i class="far fa-calendar-alt mr-1"></i> 配取日期
+        </label>
+        <input type="date" id="PICK_DATE" name="PICK_DATE" class="form-control form-control-lg"
+               style="font-size: 14pt;"
+               value="@(DateTime.Now.DayOfWeek == DayOfWeek.Monday ? DateTime.Now.ToString("yyyy-MM-dd") : DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"))">
+        <small class="form-text text-muted">格式：YYYY/MM/DD</small>
+    </div>
+
+    <!-- [新增] 4. 配取類型 (放在這裡或您想要的位置) -->
+    <div class="form-group">
+        <label for="TX_TY" class="font-weight-bold" style="font-size: 14pt;">
+            <i class="fas fa-truck-loading mr-1"></i> 配取類型
+        </label>
+        <select id="TX_TY" name="TX_TY" class="form-control form-control-lg" style="font-size: 14pt;">
+            <option value="">全部類</option>
+            <option value="A" selected>配送</option> <!-- 預設選取 -->
+            <option value="B">取貨</option>
+        </select>
+    </div>
+
+    <!-- 2. 配取站所 -->
+    <div class="form-group">
+        <label for="STATION_ID" class="font-weight-bold" style="font-size: 14pt;">
+            <i class="fas fa-warehouse mr-1"></i> 配取站所 <span class="text-danger">*</span>
+        </label>
+        <select id="STATION_ID" name="STATION_ID" class="form-control form-control-lg" style="font-size: 14pt;">
+            <!-- 選項將由 JS 動態產生 -->
+        </select>
+    </div>
+
+    <!-- 3. 已設定原廠 -->
+    <div class="form-group">
+        <label for="VD_GPID" class="font-weight-bold" style="font-size: 14pt;">
+            <i class="fas fa-industry mr-1"></i> 己設定原廠
+        </label>
+        <select id="VD_GPID" name="vd_gpid" class="form-control form-control-lg" style="font-size: 14pt;">
+            <option value="">全部設定原廠</option>
+        </select>
+    </div>
+</form>
+
+<hr class="my-4">
+
+<!-- 按鈕區 -->
+<div class="d-flex justify-content-center">
+    <!-- ★★★ 修正點：使用新的 btn-gradient-green 樣式 ★★★ -->
+    <button type="button" id="btnConfirm" class="btn btn-gradient-green btn-lg mr-3" style="font-size: 14pt; padding: 10px 30px; border-radius: 50px;" onclick="validateAndSubmit()">
+        <i class="fas fa-check mr-2"></i> 確認
+    </button>
+
+    <button type="button" class="btn btn-danger btn-lg shadow-sm" style="font-size: 14pt; padding: 10px 30px; border-radius: 50px;" data-dismiss="modal">
+        <i class="fas fa-times mr-2"></i> 取消
+    </button>
+</div>
+
+<!-- 注意：這裡不需要放 loading overlay 的 div，因為 JS 會自動產生在 body 上 -->
+
+<script src="~/js/TMS_PL_TIME.js" asp-append-version="true"></script>
