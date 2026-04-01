@@ -209,11 +209,6 @@ window.onload = () => {
     document.getElementById('i-cols').value = config.cols;
     document.getElementById('i-g-nums').value = config.gNums.join(',');
     document.getElementById('i-n-nums').value = config.nNums.join(',');
-
-    document.getElementById('i-cols').value = config.cols;
-    document.getElementById('i-g-nums').value = config.gNums.join(',');
-    document.getElementById('i-n-nums').value = config.nNums.join(',');
-
     render();
 
 };
