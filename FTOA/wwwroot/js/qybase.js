@@ -423,17 +423,22 @@ function initLayout(config) {
     if (!grids?.length) return;
     const swCk = config.SW_CK ?? 1;
     const canEd = config.CAN_ED === 1;
-    const gdTl = config.GD_TL || 0; // 0:頁籤模式, 1:主從模式
-    const showImport = config.IM_BT === 1;
-    if (canEd) {
-        $('#edit-action-group').show();
-    } else {
-        $('#edit-action-group').hide();
-    }
+    const gdTl = config.GD_TL || 0;
+    const showImport = config.IM_BT === 1; // 匯入模式標記
     if (showImport) {
+        // 匯入模式：顯示匯入鈕，顯示按鈕群組但隱藏新增/修改，僅留刪除
         $('#btnImport').show();
+        $('#edit-action-group').show();
+        $('#btnAdd, #btnEdit').hide();
+        $('#btnDel').show();
     } else {
         $('#btnImport').hide();
+        if (canEd) {
+            $('#edit-action-group').show();
+            $('#btnAdd, #btnEdit, #btnDel').show();
+        } else {
+            $('#edit-action-group').hide();
+        }
     }
     // 準備容器
     // 1. 頁籤導航列 (Tab Nav)
@@ -1132,7 +1137,7 @@ function loadGridDataAjax(gdna) {
         $(`#tbody_${gdna}`).empty();
         $('#dataLoadingOverlay').fadeIn(200);
         setGlobalLoadingState(true);
-
+        startTimer(); 
         var params = new URLSearchParams();
         $('#actionForm').serializeArray().forEach(item => {
             if (item.name !== 'currentGdna') params.append(item.name, item.value);
@@ -1172,6 +1177,7 @@ function loadGridDataAjax(gdna) {
             .finally(() => {
                 $('#dataLoadingOverlay').fadeOut(300);
                 setGlobalLoadingState(false);
+                stopTimer(); 
             });
     });
 }
@@ -1631,13 +1637,13 @@ function showDetailModal(gdna, index) {
     var state = GRID_STATE[gdna];
     if (!state || !state.filteredData) return;
 
-    // --- 判斷：是否為多頁籤環境 (圖二條件) ---
-    // 規則：分頁模式 (GD_TL=0) 且頁籤數 > 1
     var isMultiTabEnv = (CURRENT_TOOL_CONFIG.GD_TL === 0 && CURRENT_TOOL_CONFIG.GDNA_LT && CURRENT_TOOL_CONFIG.GDNA_LT.length > 1);
-
     var isNewMode = (index === 'new');
     var rowData = isNewMode ? {} : (state.filteredData[index] || {});
-    var canEdit = (typeof CURRENT_TOOL_CONFIG !== 'undefined' && CURRENT_TOOL_CONFIG.CAN_ED === 1);
+    var isImportMode = (typeof CURRENT_TOOL_CONFIG !== 'undefined' && CURRENT_TOOL_CONFIG.IM_BT === 1);
+    // 如果是匯入模式，強制將 canEdit 設為 false
+    var canEdit = (typeof CURRENT_TOOL_CONFIG !== 'undefined' && CURRENT_TOOL_CONFIG.CAN_ED === 1) && !isImportMode;
+
     var $modal = $('#detailModal');
     var $gridRow = isNewMode ? null : $(`#table_${gdna} tr[data-index="${index}"]`);
 
@@ -1730,7 +1736,7 @@ function showDetailModal(gdna, index) {
         var dirtyClass = isDirtyOnGrid ? "field-dirty" : "";
         var labelClass = (col.NdVl === 1) ? "text-danger" : (col.NdVl === 0 ? "text-primary" : "text-dark");
         var inputHtml = "";
-
+        var useHintBtn = "";
         if (isEditable) {
             var inputVal = formatValueForInput(val, col.Type);
             var safeRawVal = safeEscape(String(val));
@@ -1756,7 +1762,6 @@ function showDetailModal(gdna, index) {
                 inputHtml = `<input type="text" class="form-control editable-field ${dirtyClass}" data-gdna="${gdna}" data-field="${fieldName}" data-orig="${safeEscape(String(inputVal))}" value="${safeEscape(String(inputVal))}" style="${baseStyle};"${maxLenAttr} ${placeholderAttr}>`;
             }
             if (maxLenAttr && (col.Type === 0 || col.Type === 8)) inputHtml += `<small class="text-muted">最大長度: ${col.Width}</small>`;
-            var useHintBtn = "";
             if (isEditable && safeHint && safeHint.trim() !== "" && !safeHint.includes("SELECT") && col.BTHINT === 1) {
                 useHintBtn = `<span class="ml-2 badge badge-info btn-use-hint" style="cursor:pointer; opacity: 0.8;" title="點擊帶入內容" data-hint="${safeHint}"><i class="fas fa-paste mr-1"></i>範例</span>`;
             }
@@ -2444,24 +2449,27 @@ function validateAndSubmit() {
 function checkToolbarStatus(gdna) {
     if (!gdna) gdna = $('#currentGdnaInput').val();
     var state = GRID_STATE[gdna];
-    // 1. 判斷是否有資料
     var hasData = (state && state.filteredData && state.filteredData.length > 0);
-    // 2. 判斷是否有勾選
     var hasSelection = (state && state.selectedIds && state.selectedIds.size > 0);
-    // 3. 取得設定值 (SW_CK)
-    // 優先從全域配置拿，若無則預設為 1 (開啟勾選)
+
     var swCk = (typeof CURRENT_TOOL_CONFIG !== 'undefined' && CURRENT_TOOL_CONFIG.SW_CK !== undefined)
         ? CURRENT_TOOL_CONFIG.SW_CK : 1;
-    // [修改按鈕]: 只要 Grid 有資料即可按
-    $('#btnEdit').prop('disabled', !hasData);
-    // [刪除按鈕]: 必須要有勾選才能刪除 (通常 SW_CK=0 時不允許刪除，或需另外實作單筆刪除)
+    var isImportMode = (typeof CURRENT_TOOL_CONFIG !== 'undefined' && CURRENT_TOOL_CONFIG.IM_BT === 1);
+
+    // 修改按鈕：若為匯入模式，維持隱藏
+    if (isImportMode) {
+        $('#btnEdit').hide();
+        $('#btnAdd').hide();
+    } else {
+        $('#btnEdit').prop('disabled', !hasData);
+    }
+
+    // 刪除按鈕：匯入模式下依然可以依據勾選狀態啟用/禁用
     $('#btnDel').prop('disabled', !hasSelection);
-    // [匯出按鈕]: 
+
     if (swCk === 0) {
-        // 特殊規則：若無勾選框 (SW_CK=0)，只要有資料就可以匯出 (匯出全部)
         $('#btnExport').prop('disabled', !hasData);
     } else {
-        // 一般規則：有勾選框 (SW_CK=1)，必須先勾選才能匯出
         $('#btnExport').prop('disabled', !hasSelection);
     }
 }
@@ -2540,19 +2548,22 @@ function initSearchableDropdowns(containerSelector) {
         if ($el.html().includes("載入中")) return;
 
         // 2. 如果已經初始化過，先銷毀重來 (避免重複掛載)
-        if ($el.hasClass("select2-hidden-accessible")) {
+        if ($el.hasClass("select2-hidden-accessible"))
+        {
             $el.select2('destroy');
         }
 
         var $parentModal = $el.closest('.modal');
 
-        $el.select2({
+        $el.select2(
+            {
             theme: "bootstrap4",
             width: '100%',
             placeholder: "請搜尋...",
             allowClear: true,
             dropdownParent: $parentModal.length > 0 ? $parentModal : $(document.body),
-            matcher: function (params, data) {
+            matcher: function (params, data)
+            {
                 if ($.trim(params.term) === '') return data;
                 if (typeof data.text === 'undefined') return null;
                 var term = params.term.toUpperCase();
@@ -2564,7 +2575,8 @@ function initSearchableDropdowns(containerSelector) {
 
         // 3. ★ 重要：初始化後立刻帶入數值並移除 stealth 類別 (讓箭頭出現)
         var origVal = $el.data('original-value');
-        if (origVal) {
+        if (origVal)
+        {
             forceSetSelectValue($el, origVal);
         }
         $el.removeClass('stealth-select'); // 顯示出下拉箭頭

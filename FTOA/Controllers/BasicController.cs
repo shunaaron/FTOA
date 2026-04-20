@@ -956,6 +956,137 @@ namespace FTOA.Controllers
             return afterStart && beforeEnd;
         }
 
+
+        [HttpPost]
+        public async Task<JsonResult> ImportData(string id, IFormFile importFile)
+        {
+            // 1. 基本檢核 (保留 ID 判斷，但改為更彈性的方式)
+            if (string.IsNullOrEmpty(id)) return Json(new { success = false, message = "功能代號缺失" });
+            if (importFile == null || importFile.Length == 0) return Json(new { success = false, message = "請選擇檔案" });
+
+            try
+            {
+                var toolMenu = GetToolFromSession(id);
+                var toolConfig = ParseToolJs(toolMenu.tool_js);
+                var allConfigs = await GetGridConfigsFromApi(toolConfig);
+
+                string targetKey = allConfigs.Keys.FirstOrDefault(k => k.Equals(id, StringComparison.OrdinalIgnoreCase))
+                                   ?? toolConfig.GDNA_LT?.FirstOrDefault()?.GDNA;
+
+                if (targetKey == null) return Json(new { success = false, message = "找不到對應的 Grid 設定" });
+
+                var activeCols = allConfigs[targetKey].Where(c => c.FdSw != 0 && c.Field.ToLower() != "seq_no").ToList();
+
+                // --- 預載下拉選單資料庫 (用於驗證資料是否存在) ---
+                var dropdownCache = new Dictionary<string, HashSet<string>>(); // Key: FieldName, Value: 有效的 ID 集合
+                foreach (var col in activeCols.Where(c => c.Type == ColumnType.Dropdown || c.Type == ColumnType.SearchableDropdown))
+                {
+                    // 解析 cb_js 取得 SQL_ID
+                    string sqlId = "", inWhere = "", valField = "";
+                    try
+                    {
+                        using var jd = JsonDocument.Parse(col.CbJs);
+                        sqlId = jd.RootElement.TryGetProperty("SQL_ID", out var s) ? s.GetString() : col.Hint;
+                        inWhere = jd.RootElement.TryGetProperty("IN_WHERE", out var w) ? w.GetString() : "";
+                        valField = jd.RootElement.TryGetProperty("sa_fd", out var f) ? f.GetString() : "";
+                    }
+                    catch { sqlId = col.Hint; }
+
+                    if (!string.IsNullOrEmpty(sqlId))
+                    {
+                        var options = await QueryApiData(sqlId, inWhere);
+                        var validIds = options.Select(o => GetStr(o, valField).Trim()).Where(v => v != "").ToHashSet();
+                        dropdownCache[col.Field] = validIds;
+                    }
+                }
+
+                var dataList = new List<Dictionary<string, object>>();
+                bool hasGlobalError = false;
+
+                using (var workbook = new XLWorkbook(importFile.OpenReadStream()))
+                {
+                    var worksheet = workbook.Worksheet(1);
+                    var rows = worksheet.RangeUsed().RowsUsed().Skip(1);
+
+                    foreach (var row in rows)
+                    {
+                        var dataRow = new Dictionary<string, object>();
+                        bool rowHasError = false;
+                        List<string> errorMsgs = new List<string>();
+
+                        for (int i = 0; i < activeCols.Count; i++)
+                        {
+                            var colDef = activeCols[i];
+                            var cell = row.Cell(i + 1);
+                            string val = (cell.DataType == XLDataType.Number) ? cell.GetDouble().ToString("F0") : cell.GetValue<string>()?.Trim() ?? "";
+
+                            // --- 驗證邏輯 ---
+                            // A. PK 或 必填檢查
+                            if ((colDef.IsPk == 1 || colDef.NdVl == 1) && string.IsNullOrEmpty(val))
+                            {
+                                rowHasError = true;
+                                errorMsgs.Add($"[{colDef.Title}] 為必填(PK)");
+                            }
+                            // B. 數字格式檢查
+                            if ((colDef.Type == ColumnType.Integer || colDef.Type == ColumnType.Decimal) && !string.IsNullOrEmpty(val))
+                            {
+                                if (!double.TryParse(val, out _))
+                                {
+                                    rowHasError = true;
+                                    errorMsgs.Add($"[{colDef.Title}] 格式須為數字");
+                                }
+                            }
+                            // C. 下拉選單存在性檢查
+                            if (dropdownCache.ContainsKey(colDef.Field) && !string.IsNullOrEmpty(val))
+                            {
+                                if (!dropdownCache[colDef.Field].Contains(val))
+                                {
+                                    rowHasError = true;
+                                    errorMsgs.Add($"[{colDef.Title}] 代碼 {val} 不存在於系統中");
+                                }
+                            }
+
+                            dataRow[colDef.Field] = val;
+                        }
+
+                        if (rowHasError)
+                        {
+                            dataRow["_hasError"] = true;
+                            dataRow["_errorMsg"] = string.Join(", ", errorMsgs);
+                            hasGlobalError = true;
+                        }
+                        dataList.Add(dataRow);
+                    }
+                }
+
+                // --- 如果有任何一行錯誤，就不執行資料庫存檔，直接把結果傳回前端顯示 ---
+                if (hasGlobalError)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "匯入資料包含錯誤，請修正紅色標記行後再試",
+                        data = dataList // 包含錯誤標記的資料
+                    });
+                }
+
+                // --- 若無錯誤，執行 API 存檔 ---
+                string upId = toolConfig?.UP_ID ?? $"UP_{id}";
+                var apiPayload = new { SQL_ID = upId, IUD = 0, LG_ID = HttpContext.Session.GetString("id_no"), ROWLIST = dataList };
+                var client = _clientFactory.CreateClient();
+                var response = await client.PostAsync(_baseMdUrl, new StringContent(JsonSerializer.Serialize(apiPayload), Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return Json(new { success = true, message = $"成功匯入 {dataList.Count} 筆資料", data = dataList });
+
+                return Json(new { success = false, message = "API 儲存失敗" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "解析失敗：" + ex.Message });
+            }
+        }
+
         // 輔助：百分比上色 (HTML)
         private string GetColorPercentageHtml(double val)
         {
