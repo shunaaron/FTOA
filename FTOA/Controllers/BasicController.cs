@@ -200,6 +200,7 @@ namespace FTOA.Controllers
             public int QY_ND { get; set; } = 0;//0不用有查詢條件,1必要有查詢條件
             public int SN_IG { get; set; } = 0;//0不用顯示顯像掃碼按鈕,1要顯示
             public int IM_BT { get; set; } = 0;//0不用顯示匯入按鈕,1要顯示
+            public int ON_ED { get; set; } = 0;//0不動作.1只使用修改模式
             public List<GdnaItem> GDNA_LT { get; set; }
             [JsonPropertyName("UPX")]
             public List<UPXItem> UPX { get; set; }

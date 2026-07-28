@@ -1,0 +1,169 @@
+﻿@model FTOA.Controllers.BasicController.QybaseViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>資料轉換作業</title>
+    <link rel="stylesheet" href="~/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/all.min.css">
+    <link rel="stylesheet" href="~/css/select2.min.css">
+    <link rel="stylesheet" href="~/css/select2-bootstrap4.min.css">
+    <link rel="stylesheet" href="~/css/qybase.css" asp-append-version="true">
+
+    <style>
+        /* 1. 字體整體放大 */
+        body {
+            font-size: 18px;
+        }
+
+        .config-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            padding: 40px;
+            margin-top: 50px;
+            border-top: 10px solid #007bff;
+        }
+
+        .form-label {
+            font-size: 24px;
+            font-weight: 900;
+            color: #222;
+            margin-bottom: 15px;
+        }
+
+        .select2-container--bootstrap4 .select2-selection--single,
+        .form-control {
+            height: 60px !important;
+            font-size: 22px !important;
+            border: 2px solid #ced4da;
+        }
+
+            .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
+                line-height: 56px !important;
+            }
+
+        .btn-huge {
+            font-size: 32px !important;
+            font-weight: bold;
+            padding: 15px 0 !important;
+            border-radius: 50px !important;
+            width: 100%;
+            letter-spacing: 10px;
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+            transition: all 0.3s;
+        }
+
+            .btn-huge:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(0, 123, 255, 0.5);
+            }
+
+        .date-range-box {
+            background-color: #f0f7ff;
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px dashed #007bff;
+        }
+
+        .small-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        /* Select2 下拉字體放大 */
+        .big-font-dropdown .select2-results__option {
+            font-size: 20px !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-6">
+                <div class="config-card">
+                    <h3 class="mb-4 text-primary font-weight-bold text-center">
+                        <i class="fas fa-sync-alt mr-2"></i>資料轉換工具
+                    </h3>
+
+                    <form id="convertForm">
+                        <div class="form-group">
+                            <label class="form-label">資料轉換內容</label>
+                            <select id="qry_perdata" class="form-control select2">
+                                <option value="">正在載入轉換清單...</option>
+                            </select>
+                        </div>
+
+                        <div id="dateRangeGroup" class="form-group mt-4" style="display:none;">
+                            <label class="form-label text-info">設定時間區間</label>
+                            <div class="date-range-box">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label class="small-label">起始日期 (上月26日)</label>
+                                        <input type="date" id="dateS" class="form-control">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="small-label">結束日期 (本月25日)</label>
+                                        <input type="date" id="dateE" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <button type="button" id="btnConfirm" class="btn-glossy btn-glossy-blue btn-huge">
+                                <i class="fas fa-check-circle mr-2"></i> 確 定 轉 換
+                            </button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <button type="button" class="btn btn-link text-muted" style="font-size: 18px;" onclick="location.reload();">
+                                <i class="fas fa-undo"></i> 重置所有設定
+                            </button>
+                        </div>
+
+                        <!-- 新增：執行結果顯示區 -->
+                        <div id="resultInfo" class="mt-4 p-3 border rounded bg-light" style="display:none; font-size: 18px;">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span><i class="fas fa-clock mr-2"></i>執行開始：</span>
+                                <span id="startTime" class="font-weight-bold text-dark">-</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span><i class="fas fa-hourglass-end mr-2"></i>結束時間：</span>
+                                <span id="endTime" class="font-weight-bold text-dark">-</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-primary font-weight-bold"><i class="fas fa-stopwatch mr-2"></i>總共耗時：</span>
+                                <span id="duration" class="font-weight-bold text-danger">-</span>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading 遮罩 -->
+    <div id="dataLoadingOverlay" class="style-truck-overlay" style="display: none;">
+        <div class="loading-container text-center">
+            <div class="loading-text-truck">資料處理中...</div>
+        </div>
+    </div>
+
+    <!-- 引用順序：jQuery -> Bootstrap -> Select2 -> 自訂 JS -->
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/select2.min.js"></script>
+    <script src="~/js/cgperdata.js" asp-append-version="true"></script>
+
+</body>
+</html>

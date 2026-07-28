@@ -425,6 +425,7 @@ function initLayout(config) {
     const canEd = config.CAN_ED === 1;
     const gdTl = config.GD_TL || 0;
     const showImport = config.IM_BT === 1; // 匯入模式標記
+    const onlyed = config.ON_ED ?? 0;
     if (showImport) {
         // 匯入模式：顯示匯入鈕，顯示按鈕群組但隱藏新增/修改，僅留刪除
         $('#btnImport').show();
@@ -439,6 +440,10 @@ function initLayout(config) {
         } else {
             $('#edit-action-group').hide();
         }
+    }
+    if (onlyed == 1) {
+        $('#btnEdit').show();
+        $('#btnAdd, #btnEdit, #btnDel').hide();
     }
     // 準備容器
     // 1. 頁籤導航列 (Tab Nav)
@@ -627,6 +632,21 @@ function setupEventDelegation() {
         var val = $(this).val();
         changePageSize(gdna, val);
     });
+
+    // 全部全選按鈕點擊
+    $(document).on('click', '.btn-select-global-all', function (e) {
+        e.preventDefault();
+        var gdna = $(this).data('gdna');
+        toggleGlobalSelection(gdna, true);
+    });
+
+    // 全部取消按鈕點擊
+    $(document).on('click', '.btn-select-global-none', function (e) {
+        e.preventDefault();
+        var gdna = $(this).data('gdna');
+        toggleGlobalSelection(gdna, false);
+    });
+
     // 1. 快篩欄位下拉選單點擊事件
     $(document).on('click', '.quick-filter-columns-menu .dropdown-item', function (e) {
         e.preventDefault();
@@ -1643,7 +1663,7 @@ function showDetailModal(gdna, index) {
     var isImportMode = (typeof CURRENT_TOOL_CONFIG !== 'undefined' && CURRENT_TOOL_CONFIG.IM_BT === 1);
     // 如果是匯入模式，強制將 canEdit 設為 false
     var canEdit = (typeof CURRENT_TOOL_CONFIG !== 'undefined' && CURRENT_TOOL_CONFIG.CAN_ED === 1) && !isImportMode;
-
+    const onlyed = CURRENT_TOOL_CONFIG.ON_ED ?? 0;
     var $modal = $('#detailModal');
     var $gridRow = isNewMode ? null : $(`#table_${gdna} tr[data-index="${index}"]`);
 
@@ -1660,6 +1680,9 @@ function showDetailModal(gdna, index) {
             $('#btnModalDelete').hide();
             $('#btnModalPaste').show();
             $('#btnModalEdit').prop('disabled', false).removeClass('btn-warning').addClass('btn-primary').html('<i class="fas fa-plus mr-1"></i> 新增存檔');
+        }
+        if (onlyed == 1) {
+            $('#btnModalDelete').hide();
         }
     } else {
         var total = state.filteredData.length;
@@ -1682,6 +1705,9 @@ function showDetailModal(gdna, index) {
         } else {
             $('#action-buttons-area').hide();
             $('#btnModalPaste').hide();
+        }
+        if (onlyed == 1) {
+            $('#btnModalDelete').hide();
         }
     }
     $('#detailModalLabel').html(titleHtml);

@@ -167,7 +167,6 @@
                                 </button>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -198,7 +197,6 @@
                     <path d="M260,110 H300 L320,150 H260 V110 Z" fill="url(#windowGrad)" stroke="#01579B" stroke-width="1" />
                     <!-- 裝飾線 -->
                     <rect x="20" y="195" width="300" height="15" fill="#333" rx="5" />
-
                     <!-- 輪子 -->
                     <g class="wheel-spin">
                         <circle cx="70" cy="210" r="28" fill="#333" />
@@ -210,7 +208,6 @@
                         <circle cx="280" cy="210" r="18" fill="url(#metalGrad)" />
                         <circle cx="280" cy="210" r="5" fill="#333" />
                     </g>
-
                     <!-- 文字 -->
                     <text x="130" y="150" fill="#FFFFFF" font-family="Microsoft JhengHei, sans-serif" font-weight="900" font-size="40" text-anchor="middle" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">豐田物流</text>
                 </svg>
@@ -230,7 +227,6 @@
         var GLOBAL_GRID_CONFIGS = @Html.Raw(string.IsNullOrEmpty(ViewBag.GridConfigsJson as string) ? "{}" : ViewBag.GridConfigsJson);
         var CURRENT_TOOL_CONFIG = @Html.Raw(string.IsNullOrEmpty(ViewBag.ToolJsJson as string) ? "{}" : ViewBag.ToolJsJson);
         var SEARCH_RESULT = @Html.Raw(string.IsNullOrEmpty(ViewBag.SearchResultJson as string) ? "{}" : ViewBag.SearchResultJson);
-
         // 2. 字串型別保持原樣
         var SERVER_ACTIVE_GDNA = '@ViewBag.CurrentGdna';
         var rawGridConfigs = '@Html.Raw(ViewBag.GridConfigsJson)';
